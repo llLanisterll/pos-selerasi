@@ -29,11 +29,12 @@ declare module "$app/types" {
 	type MatcherParam<M> = M extends (param : string) => param is (infer U extends string) ? U : string;
 
 	export interface AppTypes {
-		RouteId(): "/" | "/api" | "/api/auth" | "/api/auth/login" | "/api/auth/logout" | "/api/auth/session" | "/api/categories" | "/api/categories/[id]" | "/api/clear-all" | "/api/import" | "/api/products" | "/api/products/[id]" | "/api/reset-demo" | "/api/transactions" | "/api/transactions/[id]";
+		RouteId(): "/" | "/api" | "/api/auth" | "/api/auth/login" | "/api/auth/logout" | "/api/auth/session" | "/api/categories" | "/api/categories/[id]" | "/api/clear-all" | "/api/import" | "/api/products" | "/api/products/[id]" | "/api/reset-demo" | "/api/transactions" | "/api/transactions/[id]" | "/api/users" | "/api/users/[id]";
 		RouteParams(): {
 			"/api/categories/[id]": { id: string };
 			"/api/products/[id]": { id: string };
-			"/api/transactions/[id]": { id: string }
+			"/api/transactions/[id]": { id: string };
+			"/api/users/[id]": { id: string }
 		};
 		LayoutParams(): {
 			"/": { id?: string | undefined };
@@ -50,9 +51,11 @@ declare module "$app/types" {
 			"/api/products/[id]": { id: string };
 			"/api/reset-demo": Record<string, never>;
 			"/api/transactions": { id?: string | undefined };
-			"/api/transactions/[id]": { id: string }
+			"/api/transactions/[id]": { id: string };
+			"/api/users": { id?: string | undefined };
+			"/api/users/[id]": { id: string }
 		};
-		Pathname(): "/" | "/api/auth/login" | "/api/auth/logout" | "/api/auth/session" | "/api/categories" | `/api/categories/${string}` & {} | "/api/clear-all" | "/api/import" | "/api/products" | `/api/products/${string}` & {} | "/api/reset-demo" | "/api/transactions" | `/api/transactions/${string}` & {};
+		Pathname(): "/" | "/api/auth/login" | "/api/auth/logout" | "/api/auth/session" | "/api/categories" | `/api/categories/${string}` & {} | "/api/clear-all" | "/api/import" | "/api/products" | `/api/products/${string}` & {} | "/api/reset-demo" | "/api/transactions" | `/api/transactions/${string}` & {} | "/api/users" | `/api/users/${string}` & {};
 		ResolvedPathname(): `${"" | `/${string}`}${ReturnType<AppTypes['Pathname']>}`;
 		Asset(): string & {};
 	}
