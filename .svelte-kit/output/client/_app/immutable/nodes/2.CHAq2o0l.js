@@ -39,8 +39,8 @@ import{$ as e,A as t,B as n,C as r,D as i,E as a,G as o,I as s,J as c,K as l,L a
             .text-right { text-align: right; }
             .bold { font-weight: bold; }
             .divider { border-top: 1px dashed #000; margin: 6px 0; }
+            @import url('https://fonts.googleapis.com/css2?family=Alex+Brush&display=swap');
             .header { margin-bottom: 10px; }
-            .header h2 { margin: 0; font-size: 13px; font-weight: bold; text-transform: uppercase; }
             .header p { margin: 2px 0; font-size: 9px; }
             .info-table, .items-table { width: 100%; border-collapse: collapse; }
             .info-table td { padding: 1px 0; }
@@ -50,7 +50,12 @@ import{$ as e,A as t,B as n,C as r,D as i,E as a,G as o,I as s,J as c,K as l,L a
         </head>
         <body>
           <div class="header text-center">
-            <h2>SELERASI RICEBOWL</h2>
+            <div style="display: inline-flex; align-items: center; justify-content: center; margin-bottom: 4px; border: none;">
+              <svg viewBox="0 0 100 100" style="width: 30px; height: 30px; margin-right: -4px; flex-shrink: 0;" fill="none" stroke="#000" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M 85,25 C 75,18 55,18 42,24 C 26,30 22,48 29,62 C 34,71 44,79 47,82 C 51,86 33,88 32,82 C 31,76 43,76 49,83" />
+              </svg>
+              <span style="font-family: 'Alex Brush', cursive; font-size: 27px; font-weight: normal; margin-top: 5px; letter-spacing: 0.5px; color: #000; line-height: 1;">elerasi</span>
+            </div>
             <p>Rasa Autentik, Harga Bersahabat</p>
             <p>Tgl: ${f(Z).date} | ${new Date().toLocaleTimeString(`id-ID`,{hour:`2-digit`,minute:`2-digit`})}</p>
           </div>
@@ -157,8 +162,8 @@ import{$ as e,A as t,B as n,C as r,D as i,E as a,G as o,I as s,J as c,K as l,L a
             .text-right { text-align: right; }
             .bold { font-weight: bold; }
             .divider { border-top: 1px dashed #000; margin: 6px 0; }
+            @import url('https://fonts.googleapis.com/css2?family=Alex+Brush&display=swap');
             .header { margin-bottom: 10px; }
-            .header h2 { margin: 0; font-size: 13px; font-weight: bold; text-transform: uppercase; }
             .header p { margin: 2px 0; font-size: 9px; }
             .info-table { width: 100%; border-collapse: collapse; font-size: 10px; }
             .info-table td { padding: 1px 0; }
@@ -168,7 +173,12 @@ import{$ as e,A as t,B as n,C as r,D as i,E as a,G as o,I as s,J as c,K as l,L a
         </head>
         <body>
           <div class="header text-center">
-            <h2>SELERASI RICEBOWL</h2>
+            <div style="display: inline-flex; align-items: center; justify-content: center; margin-bottom: 4px; border: none;">
+              <svg viewBox="0 0 100 100" style="width: 30px; height: 30px; margin-right: -4px; flex-shrink: 0;" fill="none" stroke="#000" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M 85,25 C 75,18 55,18 42,24 C 26,30 22,48 29,62 C 34,71 44,79 47,82 C 51,86 33,88 32,82 C 31,76 43,76 49,83" />
+              </svg>
+              <span style="font-family: 'Alex Brush', cursive; font-size: 27px; font-weight: normal; margin-top: 5px; letter-spacing: 0.5px; color: #000; line-height: 1;">elerasi</span>
+            </div>
             <p>Rasa Autentik, Harga Bersahabat</p>
             <p>Tgl: ${f(Z).date} | ${new Date().toLocaleTimeString(`id-ID`,{hour:`2-digit`,minute:`2-digit`})}</p>
           </div>
