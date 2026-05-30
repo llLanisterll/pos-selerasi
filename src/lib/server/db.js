@@ -18,4 +18,25 @@ export const supabaseAdmin = env.SUPABASE_SERVICE_ROLE_KEY
     })
   : null;
 
+/**
+ * Mencatat aktivitas pengguna ke database.
+ * @param {string} userEmail 
+ * @param {string} action 
+ * @param {string} details 
+ */
+export async function logActivity(userEmail, action, details = '') {
+  try {
+    const { error } = await supabase.from('activity_logs').insert({
+      user_email: userEmail,
+      action,
+      details
+    });
+    if (error) {
+      console.error('Error writing activity log:', error.message);
+    }
+  } catch (err) {
+    console.error('Failed to log activity:', err);
+  }
+}
+
 export default supabase;

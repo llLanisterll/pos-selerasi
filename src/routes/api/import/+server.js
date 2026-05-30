@@ -1,12 +1,13 @@
-import supabase from '$lib/server/db';
+import supabase, { logActivity } from '$lib/server/db';
 import { authenticate } from '$lib/server/auth';
 import { json } from '@sveltejs/kit';
 
 export async function POST({ request, cookies }) {
   try {
-    const { error: authError } = await authenticate(request, cookies);
+    // Hanya superadmin yang dapat melakukan impor data cadangan
+    const { user, error: authError } = await authenticate(request, cookies, 'superadmin');
     if (authError) {
-      return json({ message: authError.message }, { status: 401 });
+      return json({ message: authError.message }, { status: 403 });
     }
 
     const body = await request.json();
@@ -86,6 +87,13 @@ export async function POST({ request, cookies }) {
 
     const { data: finalProds, error: getProdsErr } = await supabase.from('products').select('*');
     if (getProdsErr) throw getProdsErr;
+
+    // Catat log aktivitas
+    await logActivity(
+      user.email,
+      'Memulihkan Cadangan Data',
+      `Kategori: ${body.categories?.length || 0}, Transaksi: ${body.transactions?.length || 0}, Produk: ${body.products?.length || 0}`
+    );
 
     return json({
       message: 'Data imported successfully',

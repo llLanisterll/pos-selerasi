@@ -92,3 +92,36 @@ INSERT INTO transactions (id, description, amount, type, category, date, quantit
 ('3', 'Belanja Beras, Ayam Fillet, & Sayuran di Pasar', 1500000, 'expense', 'Bahan Baku', '2026-05-26', 1, 'Tunai'),
 ('4', 'Beli Paper Bowl Sablon Logo Selerasi 1.000 Pcs', 1200000, 'expense', 'Packaging', '2026-05-25', 1000, 'Transfer Bank'),
 ('5', 'Ricebowl Chicken Teriyaki', 2000000, 'income', 'Katering & Event', '2026-05-24', 80, 'Transfer Bank');
+
+-- ==========================================
+-- 4. TABEL: store_settings (Pengaturan Toko & Pajak)
+-- ==========================================
+CREATE TABLE IF NOT EXISTS store_settings (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  address TEXT,
+  phone TEXT,
+  tax_rate DOUBLE PRECISION DEFAULT 0,
+  service_charge DOUBLE PRECISION DEFAULT 0,
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Seed default settings
+INSERT INTO store_settings (id, name, address, phone, tax_rate, service_charge)
+VALUES ('default', 'Selerasi Ricebowl', 'Jl. Sukarno Hatta No. 45, Bandung', '0812-3456-7890', 10, 5)
+ON CONFLICT (id) DO NOTHING;
+
+ALTER TABLE store_settings DISABLE ROW LEVEL SECURITY;
+
+-- ==========================================
+-- 5. TABEL: activity_logs (Log Aktivitas Sistem)
+-- ==========================================
+CREATE TABLE IF NOT EXISTS activity_logs (
+  id BIGSERIAL PRIMARY KEY,
+  user_email TEXT NOT NULL,
+  action TEXT NOT NULL,
+  details TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE activity_logs DISABLE ROW LEVEL SECURITY;

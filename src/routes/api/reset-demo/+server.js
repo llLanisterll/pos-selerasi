@@ -1,12 +1,13 @@
-import supabase from '$lib/server/db';
+import supabase, { logActivity } from '$lib/server/db';
 import { authenticate } from '$lib/server/auth';
 import { json } from '@sveltejs/kit';
 
 export async function POST({ request, cookies }) {
   try {
-    const { error: authError } = await authenticate(request, cookies);
+    // Hanya superadmin yang dapat melakukan reset ke data demo
+    const { user, error: authError } = await authenticate(request, cookies, 'superadmin');
     if (authError) {
-      return json({ message: authError.message }, { status: 401 });
+      return json({ message: authError.message }, { status: 403 });
     }
 
     // Delete all records
@@ -92,6 +93,9 @@ export async function POST({ request, cookies }) {
       .order('created_at', { ascending: false });
       
     if (getTxErr) throw getTxErr;
+
+    // Catat log aktivitas
+    await logActivity(user.email, 'Reset Data Demo', 'Mengatur ulang database POS ke kondisi data demo simulasi.');
     
     return json({
       message: 'Demo data reset successfully',

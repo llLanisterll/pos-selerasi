@@ -1,12 +1,13 @@
-import supabase from '$lib/server/db';
+import supabase, { logActivity } from '$lib/server/db';
 import { authenticate } from '$lib/server/auth';
 import { json } from '@sveltejs/kit';
 
 export async function POST({ request, cookies }) {
   try {
-    const { error: authError } = await authenticate(request, cookies);
+    // Hanya superadmin yang dapat menghapus seluruh data
+    const { user, error: authError } = await authenticate(request, cookies, 'superadmin');
     if (authError) {
-      return json({ message: authError.message }, { status: 401 });
+      return json({ message: authError.message }, { status: 403 });
     }
 
     // Delete all records in transactions, categories, products
@@ -17,6 +18,9 @@ export async function POST({ request, cookies }) {
     if (err1) throw err1;
     if (err2) throw err2;
     if (err3) throw err3;
+
+    // Catat log aktivitas
+    await logActivity(user.email, 'Menghapus Semua Data', 'Mengosongkan tabel kategori, produk, dan transaksi.');
     
     return json({
       message: 'All data cleared successfully',

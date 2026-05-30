@@ -1,4 +1,4 @@
-import { supabaseAdmin } from '$lib/server/db';
+import { supabaseAdmin, logActivity } from '$lib/server/db';
 import { authenticate } from '$lib/server/auth';
 import { json } from '@sveltejs/kit';
 
@@ -66,6 +66,10 @@ export async function POST({ request, cookies }) {
     if (error) {
       return json({ message: error.message }, { status: 422 });
     }
+
+    // Catat log aktivitas
+    const currentAdminEmail = (await authenticate(request, cookies, 'superadmin')).user?.email || 'System';
+    await logActivity(currentAdminEmail, 'Membuat Pengguna Baru', `Email: ${email}, Peran: ${role}`);
 
     return json({
       message: 'User baru berhasil dibuat.',

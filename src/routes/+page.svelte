@@ -12,6 +12,8 @@
   import SettingsView from '../components/SettingsView.svelte';
   import POSView from '../components/POSView.svelte';
   import UserManagement from '../components/UserManagement.svelte';
+  import StoreSettings from '../components/StoreSettings.svelte';
+  import ActivityLogs from '../components/ActivityLogs.svelte';
 
   let activeTab = 'Dashboard';
   let isAuthenticated = false;
@@ -117,6 +119,16 @@
       {:else if activeTab === 'UserSettings'}
         <section class="animate-fade-in">
           <UserManagement />
+        </section>
+
+      {:else if activeTab === 'StoreSettings'}
+        <section class="animate-fade-in">
+          <StoreSettings />
+        </section>
+
+      {:else if activeTab === 'ActivityLogs'}
+        <section class="animate-fade-in">
+          <ActivityLogs />
         </section>
 
       {:else if activeTab === 'Settings'}
