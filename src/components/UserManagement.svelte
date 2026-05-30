@@ -603,7 +603,7 @@
 
 <!-- Edit User Modal Dialog -->
 {#if showEditModal}
-  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-warm-900/40 backdrop-blur-sm">
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
     <div class="bg-white rounded-2xl border border-brand-300/60 p-6 max-w-md w-full shadow-xl animate-fade-in space-y-4">
       <div class="flex items-center justify-between border-b border-brand-200/60 pb-3">
         <h3 class="text-sm font-bold text-warm-900">Edit Pengguna</h3>
