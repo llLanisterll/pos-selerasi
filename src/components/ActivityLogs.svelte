@@ -53,8 +53,8 @@
       disabled={loading}
       class="px-4 py-2 bg-brand-100 hover:bg-brand-200 border border-brand-300/60 text-warm-850 hover:text-warm-950 text-xs font-bold rounded-xl transition duration-150 cursor-pointer active:scale-95 flex items-center gap-1.5 shadow-2xs"
     >
-      <svg class="w-3.5 h-3.5 {loading ? 'animate-spin' : ''}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.27 15" />
+      <svg class="w-3.5 h-3.5 {loading ? 'animate-spin' : ''}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
       </svg>
       Refresh Log
     </button>
