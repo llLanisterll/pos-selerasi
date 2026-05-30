@@ -10,7 +10,7 @@ return {
 	assets: new Set([]),
 	mimeTypes: {},
 	_: {
-		client: {start:"_app/immutable/entry/start.D74SIQYL.js",app:"_app/immutable/entry/app.BW81e2FX.js",imports:["_app/immutable/entry/start.D74SIQYL.js","_app/immutable/chunks/BPAQ1as_.js","_app/immutable/chunks/cEFvvZpR.js","_app/immutable/chunks/BizB481G.js","_app/immutable/entry/app.BW81e2FX.js","_app/immutable/chunks/cEFvvZpR.js","_app/immutable/chunks/BcgnSMxp.js","_app/immutable/chunks/DXLwiZ0H.js"],stylesheets:[],fonts:[],uses_env_dynamic_public:false},
+		client: {start:"_app/immutable/entry/start.CyezTfBW.js",app:"_app/immutable/entry/app.CXf5uz6O.js",imports:["_app/immutable/entry/start.CyezTfBW.js","_app/immutable/chunks/C0E0WvrR.js","_app/immutable/chunks/BY7EiJtn.js","_app/immutable/chunks/BTbRjoAn.js","_app/immutable/entry/app.CXf5uz6O.js","_app/immutable/chunks/BY7EiJtn.js","_app/immutable/chunks/BcgnSMxp.js","_app/immutable/chunks/DXLwiZ0H.js"],stylesheets:[],fonts:[],uses_env_dynamic_public:false},
 		nodes: [
 			__memo(() => import('./nodes/0.js')),
 			__memo(() => import('./nodes/1.js')),
@@ -26,6 +26,13 @@ return {
 				params: [],
 				page: { layouts: [0,], errors: [1,], leaf: 2 },
 				endpoint: null
+			},
+			{
+				id: "/api/admin/stats",
+				pattern: /^\/api\/admin\/stats\/?$/,
+				params: [],
+				page: null,
+				endpoint: __memo(() => import('./entries/endpoints/api/admin/stats/_server.js'))
 			},
 			{
 				id: "/api/auth/login",
