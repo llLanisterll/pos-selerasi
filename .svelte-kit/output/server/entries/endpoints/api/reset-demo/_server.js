@@ -1,11 +1,11 @@
-import { t as supabase } from "../../../../chunks/db.js";
+import { n as supabase, t as logActivity } from "../../../../chunks/db.js";
 import { t as authenticate } from "../../../../chunks/auth.js";
 import { json } from "@sveltejs/kit";
 //#region src/routes/api/reset-demo/+server.js
 async function POST({ request, cookies }) {
 	try {
-		const { error: authError } = await authenticate(request, cookies);
-		if (authError) return json({ message: authError.message }, { status: 401 });
+		const { user, error: authError } = await authenticate(request, cookies, "superadmin");
+		if (authError) return json({ message: authError.message }, { status: 403 });
 		const { error: delTxErr } = await supabase.from("transactions").delete().neq("id", "dummy");
 		const { error: delCatErr } = await supabase.from("categories").delete().neq("id", "dummy");
 		const { error: delProdErr } = await supabase.from("products").delete().neq("id", "dummy");
@@ -178,6 +178,7 @@ async function POST({ request, cookies }) {
 		if (txErr) throw txErr;
 		const { data: finalTxs, error: getTxErr } = await supabase.from("transactions").select("*").order("date", { ascending: false }).order("created_at", { ascending: false });
 		if (getTxErr) throw getTxErr;
+		await logActivity(user.email, "Reset Data Demo", "Mengatur ulang database POS ke kondisi data demo simulasi.");
 		return json({
 			message: "Demo data reset successfully",
 			categories: insertedCats,

@@ -29,7 +29,7 @@ declare module "$app/types" {
 	type MatcherParam<M> = M extends (param : string) => param is (infer U extends string) ? U : string;
 
 	export interface AppTypes {
-		RouteId(): "/" | "/api" | "/api/admin" | "/api/admin/stats" | "/api/auth" | "/api/auth/login" | "/api/auth/logout" | "/api/auth/session" | "/api/categories" | "/api/categories/[id]" | "/api/clear-all" | "/api/import" | "/api/products" | "/api/products/[id]" | "/api/reset-demo" | "/api/transactions" | "/api/transactions/[id]" | "/api/users" | "/api/users/[id]";
+		RouteId(): "/" | "/api" | "/api/admin" | "/api/admin/logs" | "/api/admin/settings" | "/api/admin/stats" | "/api/auth" | "/api/auth/login" | "/api/auth/logout" | "/api/auth/session" | "/api/categories" | "/api/categories/[id]" | "/api/clear-all" | "/api/import" | "/api/products" | "/api/products/[id]" | "/api/reset-demo" | "/api/transactions" | "/api/transactions/[id]" | "/api/users" | "/api/users/[id]";
 		RouteParams(): {
 			"/api/categories/[id]": { id: string };
 			"/api/products/[id]": { id: string };
@@ -40,6 +40,8 @@ declare module "$app/types" {
 			"/": { id?: string | undefined };
 			"/api": { id?: string | undefined };
 			"/api/admin": Record<string, never>;
+			"/api/admin/logs": Record<string, never>;
+			"/api/admin/settings": Record<string, never>;
 			"/api/admin/stats": Record<string, never>;
 			"/api/auth": Record<string, never>;
 			"/api/auth/login": Record<string, never>;
@@ -57,7 +59,7 @@ declare module "$app/types" {
 			"/api/users": { id?: string | undefined };
 			"/api/users/[id]": { id: string }
 		};
-		Pathname(): "/" | "/api/admin/stats" | "/api/auth/login" | "/api/auth/logout" | "/api/auth/session" | "/api/categories" | `/api/categories/${string}` & {} | "/api/clear-all" | "/api/import" | "/api/products" | `/api/products/${string}` & {} | "/api/reset-demo" | "/api/transactions" | `/api/transactions/${string}` & {} | "/api/users" | `/api/users/${string}` & {};
+		Pathname(): "/" | "/api/admin/logs" | "/api/admin/settings" | "/api/admin/stats" | "/api/auth/login" | "/api/auth/logout" | "/api/auth/session" | "/api/categories" | `/api/categories/${string}` & {} | "/api/clear-all" | "/api/import" | "/api/products" | `/api/products/${string}` & {} | "/api/reset-demo" | "/api/transactions" | `/api/transactions/${string}` & {} | "/api/users" | `/api/users/${string}` & {};
 		ResolvedPathname(): `${"" | `/${string}`}${ReturnType<AppTypes['Pathname']>}`;
 		Asset(): string & {};
 	}

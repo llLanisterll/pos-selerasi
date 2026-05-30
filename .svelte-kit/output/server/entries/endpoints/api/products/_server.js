@@ -1,4 +1,4 @@
-import { t as supabase } from "../../../../chunks/db.js";
+import { n as supabase } from "../../../../chunks/db.js";
 import { t as authenticate } from "../../../../chunks/auth.js";
 import { json } from "@sveltejs/kit";
 //#region src/routes/api/products/+server.js

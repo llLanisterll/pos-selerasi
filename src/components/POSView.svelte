@@ -21,12 +21,25 @@
   // State for Invoice Success Modal
   let showSuccessModal = false;
   let checkoutSummary = { date: '', paymentMethod: '', invoices: [] };
+  let storeSettings = { name: '', address: '', phone: '', tax_rate: 0, service_charge: 0 };
+
+  async function fetchStoreSettings() {
+    try {
+      const res = await fetch('/api/admin/settings');
+      if (res.ok) {
+        storeSettings = await res.json();
+      }
+    } catch (err) {
+      console.error('Error fetching settings:', err);
+    }
+  }
 
   // Reactive Store Values
   $: activeProducts = $products.filter(p => p.status === 'Tersedia');
 
   onMount(() => {
     fetchProducts();
+    fetchStoreSettings();
   });
 
   function openCheckoutModal(e) {
@@ -138,6 +151,10 @@
   // Calculate cart total
   $: cartTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   $: totalPortions = cart.reduce((sum, item) => sum + item.quantity, 0);
+  $: taxAmount = paymentMethod === 'Aplikasi Online' 
+    ? Math.round((cartTotal * (storeSettings.tax_rate || 0)) / 100) 
+    : 0;
+  $: grandTotal = cartTotal + taxAmount;
 
   // Process transaction submission
   async function handleCheckout(e) {
@@ -197,12 +214,35 @@
           }
         }
 
+        // Hitung PPN hanya untuk penjualan Aplikasi Online (Online Shop)
+        let custTax = 0;
+        if (custPaymentMethod === 'Aplikasi Online' && storeSettings.tax_rate > 0) {
+          custTax = Math.round((custTotal * storeSettings.tax_rate) / 100);
+        }
+
+        // Rekam transaksi pajak jika ada
+        if (custTax > 0) {
+          const taxTx = {
+            id: `${txIdPrefix}_tax`,
+            description: `Pajak PPN Online Shop (${custName})`,
+            amount: custTax,
+            type: 'income',
+            category: 'Pajak PPN',
+            date,
+            quantity: 1,
+            payment_method: custPaymentMethod
+          };
+          await addTransactionApi(taxTx);
+        }
+
         if (itemsForInvoice.length > 0) {
           invoices.push({
             txId: txIdPrefix.substring(txIdPrefix.length - 8),
             customerName: custName,
             items: itemsForInvoice,
-            total: custTotal,
+            subtotal: custTotal,
+            tax: custTax,
+            total: custTotal + custTax,
             paymentMethod: custPaymentMethod
           });
         }
@@ -303,6 +343,16 @@
           </table>
           <div class="divider"></div>
           <table class="info-table totals">
+            ${invoice.tax > 0 ? `
+            <tr>
+              <td>Subtotal:</td>
+              <td class="text-right">${formatRupiah(invoice.subtotal)}</td>
+            </tr>
+            <tr>
+              <td>PPN (${storeSettings.tax_rate}%):</td>
+              <td class="text-right">${formatRupiah(invoice.tax)}</td>
+            </tr>
+            ` : ''}
             <tr class="bold">
               <td>GRAND TOTAL:</td>
               <td class="text-right">${formatRupiah(invoice.total)}</td>
@@ -350,6 +400,16 @@
               ${itemsHtml}
               <tr style="border-top: 1px dotted #000; font-weight: bold;">
                 <td style="padding: 4px 0;">Subtotal:</td>
+                <td style="padding: 4px 0; text-align: right;">${formatRupiah(invoice.subtotal)}</td>
+              </tr>
+              ${invoice.tax > 0 ? `
+              <tr style="font-weight: bold;">
+                <td style="padding: 2px 0;">PPN (${storeSettings.tax_rate}%):</td>
+                <td style="padding: 2px 0; text-align: right;">${formatRupiah(invoice.tax)}</td>
+              </tr>
+              ` : ''}
+              <tr style="font-weight: bold;">
+                <td style="padding: 4px 0;">Total Pelanggan:</td>
                 <td style="padding: 4px 0; text-align: right;">${formatRupiah(invoice.total)}</td>
               </tr>
             </tbody>
@@ -617,10 +677,26 @@
               {totalPortions} porsi
             </span>
           </div>
+          
+          {#if paymentMethod === 'Aplikasi Online' && storeSettings.tax_rate > 0}
+            <div class="flex items-center justify-between text-xs text-warm-500 pt-1">
+              <span>Subtotal</span>
+              <span class="font-semibold text-warm-800">
+                {formatRupiah(cartTotal)}
+              </span>
+            </div>
+            <div class="flex items-center justify-between text-xs text-warm-500 pb-1">
+              <span>Pajak PPN ({storeSettings.tax_rate}%)</span>
+              <span class="font-semibold text-warm-800">
+                {formatRupiah(taxAmount)}
+              </span>
+            </div>
+          {/if}
+
           <div class="flex items-center justify-between pt-2 border-t border-brand-200/60">
             <span class="text-xs font-bold text-warm-800">Total Tagihan</span>
             <span class="text-base font-extrabold text-brand-800">
-              {formatRupiah(cartTotal)}
+              {formatRupiah(grandTotal)}
             </span>
           </div>
         </div>
@@ -858,6 +934,18 @@
             
             <div class="border-t border-dashed border-warm-300 my-1"></div>
             
+            {#if invoice.tax > 0}
+              <div class="font-mono text-[10px] text-warm-850 flex justify-between">
+                <span>Subtotal:</span>
+                <span>{formatRupiah(invoice.subtotal)}</span>
+              </div>
+              <div class="font-mono text-[10px] text-warm-850 flex justify-between">
+                <span>PPN ({storeSettings.tax_rate}%):</span>
+                <span>{formatRupiah(invoice.tax)}</span>
+              </div>
+              <div class="border-t border-dashed border-warm-300 my-1"></div>
+            {/if}
+
             <div class="font-mono text-xs flex justify-between font-bold text-brand-900">
               <span>GRAND TOTAL:</span>
               <span>{formatRupiah(invoice.total)}</span>

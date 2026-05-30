@@ -1,11 +1,11 @@
-import { t as supabase } from "../../../../chunks/db.js";
+import { n as supabase, t as logActivity } from "../../../../chunks/db.js";
 import { t as authenticate } from "../../../../chunks/auth.js";
 import { json } from "@sveltejs/kit";
 //#region src/routes/api/import/+server.js
 async function POST({ request, cookies }) {
 	try {
-		const { error: authError } = await authenticate(request, cookies);
-		if (authError) return json({ message: authError.message }, { status: 401 });
+		const { user, error: authError } = await authenticate(request, cookies, "superadmin");
+		if (authError) return json({ message: authError.message }, { status: 403 });
 		const body = await request.json();
 		const { error: delTxErr } = await supabase.from("transactions").delete().neq("id", "dummy");
 		const { error: delCatErr } = await supabase.from("categories").delete().neq("id", "dummy");
@@ -65,6 +65,7 @@ async function POST({ request, cookies }) {
 		if (getTxsErr) throw getTxsErr;
 		const { data: finalProds, error: getProdsErr } = await supabase.from("products").select("*");
 		if (getProdsErr) throw getProdsErr;
+		await logActivity(user.email, "Memulihkan Cadangan Data", `Kategori: ${body.categories?.length || 0}, Transaksi: ${body.transactions?.length || 0}, Produk: ${body.products?.length || 0}`);
 		return json({
 			message: "Data imported successfully",
 			categories: finalCats,

@@ -10,5 +10,23 @@ var supabaseAdmin = private_env.SUPABASE_SERVICE_ROLE_KEY ? createClient(SUPABAS
 	autoRefreshToken: false,
 	persistSession: false
 } }) : null;
+/**
+* Mencatat aktivitas pengguna ke database.
+* @param {string} userEmail 
+* @param {string} action 
+* @param {string} details 
+*/
+async function logActivity(userEmail, action, details = "") {
+	try {
+		const { error } = await supabase.from("activity_logs").insert({
+			user_email: userEmail,
+			action,
+			details
+		});
+		if (error) console.error("Error writing activity log:", error.message);
+	} catch (err) {
+		console.error("Failed to log activity:", err);
+	}
+}
 //#endregion
-export { supabaseAdmin as n, supabase as t };
+export { supabase as n, supabaseAdmin as r, logActivity as t };

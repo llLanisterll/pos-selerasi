@@ -1,4 +1,4 @@
-import { t as supabase } from "./db.js";
+import { n as supabase } from "./db.js";
 //#region src/lib/server/auth.js
 /**
 * Memverifikasi token autentikasi dari cookies atau header Authorization, serta opsional mengecek role user.

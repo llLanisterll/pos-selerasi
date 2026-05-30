@@ -1,5 +1,5 @@
 import { H as attr, U as escape_html, c as store_get, l as stringify, n as attr_class, o as ensure_array_like, u as unsubscribe_stores } from "../../chunks/dev.js";
-import { n as notifications, t as confirmation } from "../../chunks/confirmationStore.js";
+import { r as notifications, t as confirmation } from "../../chunks/confirmationStore.js";
 //#region src/components/NotificationToast.svelte
 function NotificationToast($$renderer, $$props) {
 	$$renderer.component(($$renderer) => {

@@ -1,4 +1,4 @@
-import { n as supabaseAdmin } from "../../../../chunks/db.js";
+import { r as supabaseAdmin, t as logActivity } from "../../../../chunks/db.js";
 import { t as authenticate } from "../../../../chunks/auth.js";
 import { json } from "@sveltejs/kit";
 //#region src/routes/api/users/+server.js
@@ -35,6 +35,7 @@ async function POST({ request, cookies }) {
 			user_metadata: { role }
 		});
 		if (error) return json({ message: error.message }, { status: 422 });
+		await logActivity((await authenticate(request, cookies, "superadmin")).user?.email || "System", "Membuat Pengguna Baru", `Email: ${email}, Peran: ${role}`);
 		return json({
 			message: "User baru berhasil dibuat.",
 			user: {

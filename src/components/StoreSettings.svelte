@@ -170,7 +170,7 @@
               />
               <span class="absolute right-3 top-2.5 text-xs text-warm-400 font-bold">%</span>
             </div>
-            <p class="text-[10px] text-warm-400 leading-normal">PPN yang dikenakan dari total belanja kotor pelanggan.</p>
+            <p class="text-[10px] text-warm-400 leading-normal">PPN hanya akan diterapkan pada transaksi dengan metode pembayaran <strong>Aplikasi Online</strong> (Online Shop).</p>
           </div>
 
           <!-- Service Charge -->
@@ -229,7 +229,7 @@
           
           <div class="flex items-start gap-2.5">
             <span class="w-5 h-5 rounded-full bg-brand-200 border border-brand-300 flex items-center justify-center font-bold text-[10px] text-brand-850 shrink-0">2</span>
-            <p><strong>Akumulasi POS</strong>: Total belanjaan di kasir akan ditambahkan PPN dan Biaya Layanan secara otomatis sesuai tarif di sini sebelum transaksi disimpan.</p>
+            <p><strong>Akumulasi POS</strong>: Pajak PPN hanya diterapkan untuk transaksi <strong>Aplikasi Online</strong>, sedangkan metode pembayaran lainnya dibebaskan dari pajak.</p>
           </div>
 
           <div class="flex items-start gap-2.5">

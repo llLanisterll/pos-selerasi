@@ -137,7 +137,7 @@
       "_confirmationStore.js"
     ],
     "css": [
-      "_app/immutable/assets/_layout.-VkdEsX4.css"
+      "_app/immutable/assets/_layout.BI3rIki_.css"
     ]
   },
   "src/routes/+page.svelte": {
@@ -153,6 +153,26 @@
     ],
     "css": [
       "_app/immutable/assets/_page.CrZaATc1.css"
+    ]
+  },
+  "src/routes/api/admin/logs/+server.js": {
+    "file": "entries/endpoints/api/admin/logs/_server.js",
+    "name": "entries/endpoints/api/admin/logs/_server",
+    "src": "src/routes/api/admin/logs/+server.js",
+    "isEntry": true,
+    "imports": [
+      "_db.js",
+      "_auth.js"
+    ]
+  },
+  "src/routes/api/admin/settings/+server.js": {
+    "file": "entries/endpoints/api/admin/settings/_server.js",
+    "name": "entries/endpoints/api/admin/settings/_server",
+    "src": "src/routes/api/admin/settings/+server.js",
+    "isEntry": true,
+    "imports": [
+      "_db.js",
+      "_auth.js"
     ]
   },
   "src/routes/api/admin/stats/+server.js": {

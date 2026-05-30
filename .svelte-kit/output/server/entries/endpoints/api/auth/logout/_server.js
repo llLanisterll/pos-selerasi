@@ -1,4 +1,4 @@
-import { t as supabase } from "../../../../../chunks/db.js";
+import { n as supabase } from "../../../../../chunks/db.js";
 import { json } from "@sveltejs/kit";
 //#region src/routes/api/auth/logout/+server.js
 async function POST({ cookies }) {
