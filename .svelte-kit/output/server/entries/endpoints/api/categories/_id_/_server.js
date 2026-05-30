@@ -1,9 +1,12 @@
 import { t as supabase } from "../../../../../chunks/db.js";
+import { t as authenticate } from "../../../../../chunks/auth.js";
 import { json } from "@sveltejs/kit";
 //#region src/routes/api/categories/[id]/+server.js
-async function PUT({ params, request }) {
+async function PUT({ params, request, cookies }) {
 	const { id } = params;
 	try {
+		const { error: authError } = await authenticate(request, cookies);
+		if (authError) return json({ message: authError.message }, { status: 401 });
 		const body = await request.json();
 		const { data: category, error: getError } = await supabase.from("categories").select("*").eq("id", id).maybeSingle();
 		if (getError) throw getError;
@@ -37,9 +40,11 @@ async function PUT({ params, request }) {
 		return json({ message: err.message }, { status: 500 });
 	}
 }
-async function DELETE({ params }) {
+async function DELETE({ params, request, cookies }) {
 	const { id } = params;
 	try {
+		const { error: authError } = await authenticate(request, cookies);
+		if (authError) return json({ message: authError.message }, { status: 401 });
 		const { data: category, error: getError } = await supabase.from("categories").select("*").eq("id", id).maybeSingle();
 		if (getError) throw getError;
 		if (!category) return json({ message: "Kategori tidak ditemukan" }, { status: 404 });

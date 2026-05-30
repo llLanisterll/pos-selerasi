@@ -1,6 +1,8 @@
 <script>
+  import { createEventDispatcher } from 'svelte';
   export let activeTab = 'Dashboard';
   
+  const dispatch = createEventDispatcher();
   let isOpen = false; // Mobile sidebar open state
   let isCollapsed = false; // Desktop sidebar collapsed state
 
@@ -55,6 +57,17 @@
   function selectTab(tabName) {
     activeTab = tabName;
     isOpen = false; // Close mobile drawer
+  }
+
+  async function handleLogout() {
+    try {
+      const res = await fetch('/api/auth/logout', { method: 'POST' });
+      if (res.ok) {
+        dispatch('logout');
+      }
+    } catch (err) {
+      console.error('Logout error:', err);
+    }
   }
 </script>
 
@@ -176,16 +189,47 @@
 
   <!-- Profile & Business Info Footer -->
   <div class="border-t border-brand-300/40 bg-brand-200/40 shrink-0 transition-all duration-300 {isCollapsed ? 'p-2' : 'p-3'}">
-    <div class="flex items-center bg-brand-500/50 rounded-xl border border-brand-400/50 transition-all duration-300 {isCollapsed ? 'justify-center space-x-0 p-1.5' : 'space-x-3 p-2'}">
-      <div class="w-9 h-9 bg-brand-600 border border-brand-700/40 rounded-full flex items-center justify-center select-none shadow-sm shrink-0">
-        <span class="text-xs font-bold text-warm-900">SS</span>
-      </div>
-      {#if !isCollapsed}
-        <div class="min-w-0 flex-1 animate-fade-in whitespace-nowrap overflow-hidden">
-          <p class="text-xs font-bold text-warm-900 truncate">Sarham San</p>
-          <p class="text-[10px] text-brand-800 font-semibold tracking-wide uppercase mt-0.5">Selerasi Owner</p>
+    <div class="flex items-center bg-brand-500/50 rounded-xl border border-brand-400/50 transition-all duration-300 justify-between {isCollapsed ? 'p-1.5' : 'p-2 space-x-3'}">
+      <div class="flex items-center min-w-0 {isCollapsed ? '' : 'space-x-2'}">
+        <div class="w-8 h-8 bg-brand-600 border border-brand-700/40 rounded-full flex items-center justify-center select-none shadow-sm shrink-0">
+          <span class="text-xs font-bold text-warm-900">SS</span>
         </div>
+        {#if !isCollapsed}
+          <div class="min-w-0 flex-1 animate-fade-in whitespace-nowrap overflow-hidden">
+            <p class="text-xs font-bold text-warm-900 truncate">Sarham San</p>
+            <p class="text-[10px] text-brand-800 font-semibold tracking-wide uppercase mt-0.5">Selerasi Owner</p>
+          </div>
+        {/if}
+      </div>
+      
+      <!-- Logout Button -->
+      {#if !isCollapsed}
+        <button
+          type="button"
+          on:click={handleLogout}
+          class="p-1.5 text-rose-600 hover:text-rose-800 hover:bg-rose-50 border border-rose-200/40 hover:border-rose-300/60 rounded-lg cursor-pointer transition active:scale-95 shrink-0"
+          title="Logout"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
+          </svg>
+        </button>
       {/if}
     </div>
+    {#if isCollapsed}
+      <div class="flex justify-center mt-2">
+        <button
+          type="button"
+          on:click={handleLogout}
+          class="p-1.5 text-rose-600 hover:text-rose-800 hover:bg-rose-50 border border-rose-200/40 hover:border-rose-300/60 rounded-lg cursor-pointer transition active:scale-95"
+          title="Logout"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
+          </svg>
+        </button>
+      </div>
+    {/if}
   </div>
 </aside>
+

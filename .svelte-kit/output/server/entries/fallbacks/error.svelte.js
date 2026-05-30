@@ -1,4 +1,4 @@
-import { t as index_server_exports } from "../../chunks/index-server.js";
+import { n as index_server_exports } from "../../chunks/index-server.js";
 import { v as noop } from "../../chunks/shared.js";
 import "../../chunks/environment.js";
 import "../../chunks/exports.js";

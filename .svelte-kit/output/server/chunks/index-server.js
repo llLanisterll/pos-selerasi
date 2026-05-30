@@ -142,4 +142,4 @@ function fork() {
 async function tick() {}
 async function settled() {}
 //#endregion
-export { hydratable as i, onDestroy as n, tick as r, index_server_exports as t };
+export { hydratable as a, tick as i, index_server_exports as n, onDestroy as r, createEventDispatcher as t };

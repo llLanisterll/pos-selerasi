@@ -1,9 +1,15 @@
 import supabase from '$lib/server/db';
+import { authenticate } from '$lib/server/auth';
 import { json } from '@sveltejs/kit';
 
-export async function PUT({ params, request }) {
+export async function PUT({ params, request, cookies }) {
   const { id } = params;
   try {
+    const { error: authError } = await authenticate(request, cookies);
+    if (authError) {
+      return json({ message: authError.message }, { status: 401 });
+    }
+
     const body = await request.json();
     
     // Check if product exists
@@ -54,9 +60,14 @@ export async function PUT({ params, request }) {
   }
 }
 
-export async function DELETE({ params }) {
+export async function DELETE({ params, request, cookies }) {
   const { id } = params;
   try {
+    const { error: authError } = await authenticate(request, cookies);
+    if (authError) {
+      return json({ message: authError.message }, { status: 401 });
+    }
+
     // Check if product exists
     const { data: product, error: getError } = await supabase
       .from('products')

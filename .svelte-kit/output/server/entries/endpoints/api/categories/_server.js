@@ -1,8 +1,11 @@
 import { t as supabase } from "../../../../chunks/db.js";
+import { t as authenticate } from "../../../../chunks/auth.js";
 import { json } from "@sveltejs/kit";
 //#region src/routes/api/categories/+server.js
-async function GET() {
+async function GET({ request, cookies }) {
 	try {
+		const { error: authError } = await authenticate(request, cookies);
+		if (authError) return json({ message: authError.message }, { status: 401 });
 		const { data: categories, error } = await supabase.from("categories").select("*").order("name", { ascending: true });
 		if (error) throw error;
 		return json(categories);
@@ -10,8 +13,10 @@ async function GET() {
 		return json({ message: err.message }, { status: 500 });
 	}
 }
-async function POST({ request }) {
+async function POST({ request, cookies }) {
 	try {
+		const { error: authError } = await authenticate(request, cookies);
+		if (authError) return json({ message: authError.message }, { status: 401 });
 		const body = await request.json();
 		const name = body.name.trim();
 		const { data: existing, error: findError } = await supabase.from("categories").select("*").ilike("name", name).maybeSingle();

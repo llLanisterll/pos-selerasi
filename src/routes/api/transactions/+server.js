@@ -1,8 +1,14 @@
 import supabase from '$lib/server/db';
+import { authenticate } from '$lib/server/auth';
 import { json } from '@sveltejs/kit';
 
-export async function GET() {
+export async function GET({ request, cookies }) {
   try {
+    const { error: authError } = await authenticate(request, cookies);
+    if (authError) {
+      return json({ message: authError.message }, { status: 401 });
+    }
+
     const { data: transactions, error } = await supabase
       .from('transactions')
       .select('*')
@@ -16,8 +22,13 @@ export async function GET() {
   }
 }
 
-export async function POST({ request }) {
+export async function POST({ request, cookies }) {
   try {
+    const { error: authError } = await authenticate(request, cookies);
+    if (authError) {
+      return json({ message: authError.message }, { status: 401 });
+    }
+
     const body = await request.json();
     const now = new Date().toISOString();
     

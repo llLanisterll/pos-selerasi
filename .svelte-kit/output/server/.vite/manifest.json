@@ -9,6 +9,13 @@
       "_internal.js"
     ]
   },
+  "_auth.js": {
+    "file": "chunks/auth.js",
+    "name": "auth",
+    "imports": [
+      "_db.js"
+    ]
+  },
   "_confirmationStore.js": {
     "file": "chunks/confirmationStore.js",
     "name": "confirmationStore",
@@ -121,7 +128,7 @@
       "_confirmationStore.js"
     ],
     "css": [
-      "_app/immutable/assets/_layout.DayOFCU2.css"
+      "_app/immutable/assets/_layout.D_SOKzEM.css"
     ]
   },
   "src/routes/+page.svelte": {
@@ -136,7 +143,34 @@
       "_confirmationStore.js"
     ],
     "css": [
-      "_app/immutable/assets/_page.B4kx-CCj.css"
+      "_app/immutable/assets/_page.CrZaATc1.css"
+    ]
+  },
+  "src/routes/api/auth/login/+server.js": {
+    "file": "entries/endpoints/api/auth/login/_server.js",
+    "name": "entries/endpoints/api/auth/login/_server",
+    "src": "src/routes/api/auth/login/+server.js",
+    "isEntry": true,
+    "imports": [
+      "_db.js"
+    ]
+  },
+  "src/routes/api/auth/logout/+server.js": {
+    "file": "entries/endpoints/api/auth/logout/_server.js",
+    "name": "entries/endpoints/api/auth/logout/_server",
+    "src": "src/routes/api/auth/logout/+server.js",
+    "isEntry": true,
+    "imports": [
+      "_db.js"
+    ]
+  },
+  "src/routes/api/auth/session/+server.js": {
+    "file": "entries/endpoints/api/auth/session/_server.js",
+    "name": "entries/endpoints/api/auth/session/_server",
+    "src": "src/routes/api/auth/session/+server.js",
+    "isEntry": true,
+    "imports": [
+      "_auth.js"
     ]
   },
   "src/routes/api/categories/+server.js": {
@@ -145,7 +179,8 @@
     "src": "src/routes/api/categories/+server.js",
     "isEntry": true,
     "imports": [
-      "_db.js"
+      "_db.js",
+      "_auth.js"
     ]
   },
   "src/routes/api/categories/[id]/+server.js": {
@@ -154,7 +189,8 @@
     "src": "src/routes/api/categories/[id]/+server.js",
     "isEntry": true,
     "imports": [
-      "_db.js"
+      "_db.js",
+      "_auth.js"
     ]
   },
   "src/routes/api/clear-all/+server.js": {
@@ -163,7 +199,8 @@
     "src": "src/routes/api/clear-all/+server.js",
     "isEntry": true,
     "imports": [
-      "_db.js"
+      "_db.js",
+      "_auth.js"
     ]
   },
   "src/routes/api/import/+server.js": {
@@ -172,7 +209,8 @@
     "src": "src/routes/api/import/+server.js",
     "isEntry": true,
     "imports": [
-      "_db.js"
+      "_db.js",
+      "_auth.js"
     ]
   },
   "src/routes/api/products/+server.js": {
@@ -181,7 +219,8 @@
     "src": "src/routes/api/products/+server.js",
     "isEntry": true,
     "imports": [
-      "_db.js"
+      "_db.js",
+      "_auth.js"
     ]
   },
   "src/routes/api/products/[id]/+server.js": {
@@ -190,7 +229,8 @@
     "src": "src/routes/api/products/[id]/+server.js",
     "isEntry": true,
     "imports": [
-      "_db.js"
+      "_db.js",
+      "_auth.js"
     ]
   },
   "src/routes/api/reset-demo/+server.js": {
@@ -199,7 +239,8 @@
     "src": "src/routes/api/reset-demo/+server.js",
     "isEntry": true,
     "imports": [
-      "_db.js"
+      "_db.js",
+      "_auth.js"
     ]
   },
   "src/routes/api/transactions/+server.js": {
@@ -208,7 +249,8 @@
     "src": "src/routes/api/transactions/+server.js",
     "isEntry": true,
     "imports": [
-      "_db.js"
+      "_db.js",
+      "_auth.js"
     ]
   },
   "src/routes/api/transactions/[id]/+server.js": {
@@ -217,7 +259,8 @@
     "src": "src/routes/api/transactions/[id]/+server.js",
     "isEntry": true,
     "imports": [
-      "_db.js"
+      "_db.js",
+      "_auth.js"
     ]
   }
 }

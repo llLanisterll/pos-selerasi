@@ -1,8 +1,11 @@
 import { t as supabase } from "../../../../chunks/db.js";
+import { t as authenticate } from "../../../../chunks/auth.js";
 import { json } from "@sveltejs/kit";
 //#region src/routes/api/import/+server.js
-async function POST({ request }) {
+async function POST({ request, cookies }) {
 	try {
+		const { error: authError } = await authenticate(request, cookies);
+		if (authError) return json({ message: authError.message }, { status: 401 });
 		const body = await request.json();
 		const { error: delTxErr } = await supabase.from("transactions").delete().neq("id", "dummy");
 		const { error: delCatErr } = await supabase.from("categories").delete().neq("id", "dummy");

@@ -1,8 +1,14 @@
 import supabase from '$lib/server/db';
+import { authenticate } from '$lib/server/auth';
 import { json } from '@sveltejs/kit';
 
-export async function POST() {
+export async function POST({ request, cookies }) {
   try {
+    const { error: authError } = await authenticate(request, cookies);
+    if (authError) {
+      return json({ message: authError.message }, { status: 401 });
+    }
+
     // Delete all records in transactions, categories, products
     const { error: err1 } = await supabase.from('transactions').delete().neq('id', 'dummy');
     const { error: err2 } = await supabase.from('categories').delete().neq('id', 'dummy');

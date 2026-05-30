@@ -1,9 +1,15 @@
 import supabase from '$lib/server/db';
+import { authenticate } from '$lib/server/auth';
 import { json } from '@sveltejs/kit';
 
-export async function DELETE({ params }) {
+export async function DELETE({ params, request, cookies }) {
   const { id } = params;
   try {
+    const { error: authError } = await authenticate(request, cookies);
+    if (authError) {
+      return json({ message: authError.message }, { status: 401 });
+    }
+
     // Check if transaction exists
     const { data: transaction, error: getError } = await supabase
       .from('transactions')
