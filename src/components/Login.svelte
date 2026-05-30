@@ -49,9 +49,9 @@
     
     <!-- Logo & Header -->
     <div class="text-center mb-8">
-      <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-brand-700 text-brand-50 shadow-lg shadow-brand-700/20 mb-4 animate-bounce">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-8 h-8">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818.879.659c1.403.879 3.833.879 5.236 0m-5.236-.307.128-6.177a8.25 8.25 0 0 1 1.404-3.67M11.24 2.1485c.445 0 .833.207 1.085.53l.9 1.25M6.285 5.25c.252-.323.64-.53 1.085-.53h8.56c.445 0 .833.207 1.085.53" />
+      <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-brand-700 text-brand-50 shadow-lg shadow-brand-700/20 mb-4 animate-bounce p-3.5">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full">
+          <path d="M 85,25 C 75,18 55,18 42,24 C 26,30 22,48 29,62 C 34,71 44,79 47,82 C 51,86 33,88 32,82 C 31,76 43,76 49,83" />
         </svg>
       </div>
       <h2 class="text-2xl font-bold tracking-tight text-warm-900">Selerasi POS</h2>

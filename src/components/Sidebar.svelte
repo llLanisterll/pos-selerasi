@@ -109,8 +109,10 @@
 <!-- Mobile Navigation Bar Header -->
 <header class="md:hidden w-full bg-brand-100/90 backdrop-blur-md border-b border-brand-300/60 px-4 py-3 flex items-center justify-between sticky top-0 z-40 shadow-sm">
   <div class="flex items-center space-x-2">
-    <div class="w-8 h-8 bg-brand-500 border border-brand-600/40 flex items-center justify-center rounded-lg shadow-sm">
-      <span class="text-warm-900 font-bold text-sm">S</span>
+    <div class="w-8 h-8 bg-brand-500 border border-brand-600/40 flex items-center justify-center rounded-lg shadow-sm p-1.5 text-warm-900">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full">
+        <path d="M 85,25 C 75,18 55,18 42,24 C 26,30 22,48 29,62 C 34,71 44,79 47,82 C 51,86 33,88 32,82 C 31,76 43,76 49,83" />
+      </svg>
     </div>
     <span class="text-lg font-bold text-warm-900">selerasi<span class="text-brand-700">.</span></span>
   </div>
@@ -165,8 +167,10 @@
     <!-- Branding Header -->
     <div class="h-16 border-b border-brand-300/40 hidden md:flex items-center transition-all duration-300 {isCollapsed ? 'justify-center px-2' : 'px-4'}">
       <div class="flex items-center space-x-2.5 overflow-hidden">
-        <div class="w-9 h-9 bg-brand-500 border border-brand-600/40 flex items-center justify-center rounded-xl shadow-sm shrink-0">
-          <span class="text-warm-900 font-bold text-sm">S</span>
+        <div class="w-9 h-9 bg-brand-500 border border-brand-600/40 flex items-center justify-center rounded-xl shadow-sm shrink-0 p-2 text-warm-900">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full">
+            <path d="M 85,25 C 75,18 55,18 42,24 C 26,30 22,48 29,62 C 34,71 44,79 47,82 C 51,86 33,88 32,82 C 31,76 43,76 49,83" />
+          </svg>
         </div>
         {#if !isCollapsed}
           <div class="animate-fade-in whitespace-nowrap">
