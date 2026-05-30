@@ -1,0 +1,75 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", system-ui, sans-serif;
+
+  /* ─── Warm Butter-Cream Brand Palette (centered on #f4e9bb) ─── */
+  --color-brand-50:  #fffef9;
+  --color-brand-100: #fdf8e8;
+  --color-brand-200: #faf1ce;
+  --color-brand-300: #f7e8b0;
+  --color-brand-400: #f5ecbf;
+  --color-brand-500: #f4e9bb; /* PRIMARY — the requested colour */
+  --color-brand-600: #dfc98a;
+  --color-brand-700: #c4994f;
+  --color-brand-800: #9a7331;
+  --color-brand-900: #6f4f1d;
+  --color-brand-950: #3e2a09;
+
+  /* ─── Warm Neutral Scale (replaces cold zinc in light theme) ─── */
+  --color-warm-50:  #fafaf8;
+  --color-warm-100: #f5f4f0;
+  --color-warm-200: #eae8e2;
+  --color-warm-300: #d5d1c8;
+  --color-warm-400: #b0aa9e;
+  --color-warm-500: #8a8276;
+  --color-warm-600: #6b6359;
+  --color-warm-700: #524c43;
+  --color-warm-800: #3a352e;
+  --color-warm-900: #252119;
+  --color-warm-950: #13110c;
+}
+
+/* ─── Global Reset ─── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply antialiased;
+  font-family: var(--font-sans);
+  background-color: #f4e9bb;
+  background-image:
+    radial-gradient(ellipse at 0% 0%, #fdf8e8 0%, transparent 55%),
+    radial-gradient(ellipse at 100% 100%, #f7e8b0 0%, transparent 55%);
+  background-attachment: fixed;
+  color: #252119;
+  min-height: 100vh;
+}
+
+/* ─── Smooth scrollbar ─── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #fdf8e8; }
+::-webkit-scrollbar-thumb { background: #dfc98a; border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: #c4994f; }
+
+/* ─── Selection ─── */
+::selection { background-color: #c4994f; color: #fffef9; }
+
+/* ─── Focus ring ─── */
+:focus-visible { outline: 2px solid #c4994f; outline-offset: 2px; }
+
+/* ─── Date input light scheme ─── */
+input[type="date"] { color-scheme: light; }
+
+/* ─── Fade-in animation ─── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in { animation: fadeIn 0.25s ease both; }
+
