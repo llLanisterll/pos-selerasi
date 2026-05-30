@@ -19,11 +19,25 @@
   let submittingUser = false;
   let userError = '';
 
+  // State untuk Statistik
+  let stats = { usersCount: 0, productsCount: 0, categoriesCount: 0, transactionsCount: 0 };
+  let loadingStats = true;
+
+  // State untuk Edit User Modal
+  let editingUser = null;
+  let editRole = 'owner';
+  let editPassword = '';
+  let submittingEdit = false;
+  let showEditModal = false;
+
   // Backup & Reset file input
   let fileInput;
 
   onMount(async () => {
-    await fetchUsers();
+    await Promise.all([
+      fetchUsers(),
+      fetchStats()
+    ]);
   });
 
   async function fetchUsers() {
@@ -42,6 +56,20 @@
       userError = 'Koneksi gagal saat memuat user.';
     } finally {
       loadingUsers = false;
+    }
+  }
+
+  async function fetchStats() {
+    loadingStats = true;
+    try {
+      const res = await fetch('/api/admin/stats');
+      if (res.ok) {
+        stats = await res.json();
+      }
+    } catch (err) {
+      console.error('Error fetching stats:', err);
+    } finally {
+      loadingStats = false;
     }
   }
 
@@ -68,7 +96,7 @@
         email = '';
         password = '';
         role = 'owner';
-        await fetchUsers(); // Refresh list
+        await Promise.all([fetchUsers(), fetchStats()]); // Refresh list & stats
       } else {
         addNotification(data.message || 'Gagal membuat user baru.', 'error');
       }
@@ -77,6 +105,45 @@
       addNotification('Gagal terhubung ke server.', 'error');
     } finally {
       submittingUser = false;
+    }
+  }
+
+  function openEditModal(user) {
+    editingUser = user;
+    editRole = user.role || 'owner';
+    editPassword = '';
+    showEditModal = true;
+  }
+
+  async function handleEditUser(e) {
+    e.preventDefault();
+    if (submittingEdit) return;
+
+    submittingEdit = true;
+    try {
+      const res = await fetch(`/api/users/${editingUser.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          role: editRole,
+          password: editPassword.trim() ? editPassword : undefined
+        })
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        addNotification(`User ${editingUser.email} berhasil diperbarui!`, 'success');
+        showEditModal = false;
+        editingUser = null;
+        await Promise.all([fetchUsers(), fetchStats()]);
+      } else {
+        addNotification(data.message || 'Gagal memperbarui user.', 'error');
+      }
+    } catch (err) {
+      console.error('Error editing user:', err);
+      addNotification('Gagal terhubung ke server.', 'error');
+    } finally {
+      submittingEdit = false;
     }
   }
 
@@ -95,7 +162,7 @@
 
           if (res.ok) {
             addNotification(`Akun "${userToDelete.email}" berhasil dihapus.`, 'success');
-            await fetchUsers();
+            await Promise.all([fetchUsers(), fetchStats()]);
           } else {
             addNotification(data.message || 'Gagal menghapus user.', 'error');
           }
@@ -128,6 +195,44 @@
     addNotification('Cadangan data berhasil diekspor!', 'success');
   }
 
+  function handleExportCSV() {
+    if (!$transactions || $transactions.length === 0) {
+      addNotification('Tidak ada data transaksi untuk diekspor.', 'warning');
+      return;
+    }
+
+    // Header CSV
+    const headers = ['ID', 'Tanggal', 'Keterangan', 'Tipe', 'Kategori', 'Jumlah (Rp)', 'Jumlah Satuan', 'Metode Pembayaran'];
+    
+    // Baris CSV
+    const rows = $transactions.map(tx => [
+      tx.id,
+      tx.date,
+      `"${tx.description.replace(/"/g, '""')}"`, // Escape double-quotes
+      tx.type === 'income' ? 'Pemasukan' : 'Pengeluaran',
+      `"${(tx.category || '').replace(/"/g, '""')}"`,
+      tx.amount,
+      tx.quantity || 1,
+      tx.payment_method || 'Tunai'
+    ]);
+
+    // Gabungkan
+    const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    
+    // Download trigger
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.setAttribute("href", url);
+    downloadAnchor.setAttribute("download", `selerasi_laporan_transaksi_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+    URL.revokeObjectURL(url);
+
+    addNotification('Laporan transaksi CSV berhasil diekspor!', 'success');
+  }
+
   function handleImport(e) {
     const file = e.target.files[0];
     if (!file) return;
@@ -140,6 +245,7 @@
           const ok = await importDataApi(data);
           if (ok) {
             addNotification('Cadangan data berhasil dipulihkan!', 'success');
+            await fetchStats();
           } else {
             addNotification('Gagal memulihkan cadangan data ke server.', 'error');
           }
@@ -164,6 +270,7 @@
         const ok = await resetDemoApi();
         if (ok) {
           addNotification('Berhasil mengatur ulang aplikasi ke data demo!', 'success');
+          await fetchStats();
         } else {
           addNotification('Gagal mengatur ulang data demo.', 'error');
         }
@@ -181,6 +288,7 @@
         const ok = await clearAllApi();
         if (ok) {
           addNotification('Semua data berhasil dibersihkan!', 'success');
+          await fetchStats();
         } else {
           addNotification('Gagal membersihkan data keuangan.', 'error');
         }
@@ -194,6 +302,65 @@
   <div class="pb-6 border-b border-brand-300/60">
     <h1 class="text-2xl font-bold tracking-tight text-warm-900">Pengaturan User & Data</h1>
     <p class="text-sm text-warm-500 mt-1">Halaman khusus Superadmin untuk mengelola pengguna (Owner/Admin) dan mencadangkan database.</p>
+  </div>
+
+  <!-- Section: Statistik Sistem -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <!-- Card 1: Users -->
+    <div class="bg-white/70 backdrop-blur-sm border border-brand-300/60 rounded-2xl p-5 shadow-sm flex items-center gap-4">
+      <div class="p-3 bg-purple-50 border border-purple-200 text-purple-700 rounded-xl">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+        </svg>
+      </div>
+      <div>
+        <p class="text-[10px] font-bold text-warm-400 uppercase tracking-wider">Total Pengguna</p>
+        <h4 class="text-xl font-extrabold text-warm-900 mt-0.5">{loadingStats ? '...' : stats.usersCount}</h4>
+        <p class="text-[10px] text-warm-500">Superadmin & Owner</p>
+      </div>
+    </div>
+
+    <!-- Card 2: Transactions -->
+    <div class="bg-white/70 backdrop-blur-sm border border-brand-300/60 rounded-2xl p-5 shadow-sm flex items-center gap-4">
+      <div class="p-3 bg-brand-50 border border-brand-200 text-brand-700 rounded-xl">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+        </svg>
+      </div>
+      <div>
+        <p class="text-[10px] font-bold text-warm-400 uppercase tracking-wider">Total Transaksi</p>
+        <h4 class="text-xl font-extrabold text-warm-900 mt-0.5">{loadingStats ? '...' : stats.transactionsCount}</h4>
+        <p class="text-[10px] text-warm-500">Catatan Keuangan</p>
+      </div>
+    </div>
+
+    <!-- Card 3: Products -->
+    <div class="bg-white/70 backdrop-blur-sm border border-brand-300/60 rounded-2xl p-5 shadow-sm flex items-center gap-4">
+      <div class="p-3 bg-blue-50 border border-blue-200 text-blue-700 rounded-xl">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.5 8.25l-7.5 7.5-7.5-7.5m15 5.25l-7.5 7.5-7.5-7.5" />
+        </svg>
+      </div>
+      <div>
+        <p class="text-[10px] font-bold text-warm-400 uppercase tracking-wider">Total Menu Produk</p>
+        <h4 class="text-xl font-extrabold text-warm-900 mt-0.5">{loadingStats ? '...' : stats.productsCount}</h4>
+        <p class="text-[10px] text-warm-500">Varian Menu POS</p>
+      </div>
+    </div>
+
+    <!-- Card 4: Categories -->
+    <div class="bg-white/70 backdrop-blur-sm border border-brand-300/60 rounded-2xl p-5 shadow-sm flex items-center gap-4">
+      <div class="p-3 bg-amber-50 border border-amber-200 text-amber-700 rounded-xl">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+      </div>
+      <div>
+        <p class="text-[10px] font-bold text-warm-400 uppercase tracking-wider">Total Kategori</p>
+        <h4 class="text-xl font-extrabold text-warm-900 mt-0.5">{loadingStats ? '...' : stats.categoriesCount}</h4>
+        <p class="text-[10px] text-warm-500">Kategori Keuangan</p>
+      </div>
+    </div>
   </div>
 
   <!-- Section 1: User Management -->
@@ -310,13 +477,22 @@
                   </td>
                   <td class="py-3 text-xs text-warm-400">{new Date(user.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</td>
                   <td class="py-3 text-right">
-                    <button
-                      on:click={() => handleDeleteUser(user)}
-                      title="Hapus Pengguna"
-                      class="text-warm-400 hover:text-rose-500 text-xs font-semibold py-1 px-2.5 border border-brand-300 rounded-lg hover:bg-rose-50 transition-all cursor-pointer active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed"
-                    >
-                      Hapus
-                    </button>
+                    <div class="flex items-center justify-end space-x-2">
+                      <button
+                        on:click={() => openEditModal(user)}
+                        title="Edit Pengguna"
+                        class="text-warm-500 hover:text-brand-900 text-xs font-semibold py-1 px-2.5 border border-brand-300 rounded-lg hover:bg-brand-100 transition-all cursor-pointer active:scale-95"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        on:click={() => handleDeleteUser(user)}
+                        title="Hapus Pengguna"
+                        class="text-warm-400 hover:text-rose-500 text-xs font-semibold py-1 px-2.5 border border-brand-300 rounded-lg hover:bg-rose-50 transition-all cursor-pointer active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed"
+                      >
+                        Hapus
+                      </button>
+                    </div>
                   </td>
                 </tr>
               {/each}
@@ -337,7 +513,7 @@
       <span class="text-[10px] bg-brand-200/70 text-warm-700 border border-brand-300 font-bold px-2 py-0.5 rounded tracking-wide uppercase">Cadangan &amp; Pemulihan</span>
     </h3>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
       <!-- Export Card -->
       <div class="border border-brand-300/60 rounded-xl p-4 flex flex-col justify-between hover:border-brand-500 hover:shadow-sm transition-colors bg-brand-50/60">
         <div>
@@ -350,6 +526,21 @@
           class="w-full mt-4 py-2 bg-brand-200 hover:bg-brand-300 border border-brand-400/50 text-warm-800 text-xs font-semibold rounded-lg transition-colors cursor-pointer active:scale-95 text-center"
         >
           Ekspor Cadangan
+        </button>
+      </div>
+
+      <!-- Export CSV Card -->
+      <div class="border border-brand-300/60 rounded-xl p-4 flex flex-col justify-between hover:border-brand-500 hover:shadow-sm transition-colors bg-brand-50/60">
+        <div>
+          <h4 class="text-xs font-bold text-warm-800 uppercase tracking-wide">Laporan CSV (Excel)</h4>
+          <p class="text-[11px] text-warm-500 mt-1">Ekspor riwayat transaksi Anda ke format CSV agar mudah dianalisis di Excel atau Google Sheets.</p>
+        </div>
+        <button
+          type="button"
+          on:click={handleExportCSV}
+          class="w-full mt-4 py-2 bg-brand-200 hover:bg-brand-300 border border-brand-400/50 text-warm-800 text-xs font-semibold rounded-lg transition-colors cursor-pointer active:scale-95 text-center"
+        >
+          Ekspor ke CSV
         </button>
       </div>
 
@@ -409,3 +600,82 @@
     </div>
   </div>
 </div>
+
+<!-- Edit User Modal Dialog -->
+{#if showEditModal}
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-warm-900/40 backdrop-blur-sm">
+    <div class="bg-white rounded-2xl border border-brand-300/60 p-6 max-w-md w-full shadow-xl animate-fade-in space-y-4">
+      <div class="flex items-center justify-between border-b border-brand-200/60 pb-3">
+        <h3 class="text-sm font-bold text-warm-900">Edit Pengguna</h3>
+        <button 
+          on:click={() => showEditModal = false} 
+          class="text-warm-400 hover:text-warm-700 cursor-pointer"
+          title="Tutup"
+          aria-label="Tutup"
+        >
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <form on:submit={handleEditUser} class="space-y-4">
+        <div>
+          <label for="edit-email" class="text-xs font-medium text-warm-500">Email</label>
+          <input 
+            id="edit-email"
+            type="email" 
+            value={editingUser.email} 
+            disabled 
+            class="w-full px-3 py-2 bg-brand-50 border border-brand-200 text-warm-500 rounded-xl text-sm cursor-not-allowed mt-1"
+          />
+        </div>
+
+        <div>
+          <label for="edit-role" class="text-xs font-medium text-warm-600">Peran Akses (Role)</label>
+          <select
+            id="edit-role"
+            bind:value={editRole}
+            class="w-full px-3 py-2 bg-brand-50 border border-brand-300/60 text-warm-900 focus:border-brand-700 focus:outline-none transition-colors rounded-xl text-sm mt-1"
+          >
+            <option value="owner">Owner (Akses POS & Laporan)</option>
+            <option value="superadmin">Superadmin (Akses Penuh & Manajemen Data)</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="edit-password" class="text-xs font-medium text-warm-600">Password Baru (Opsional)</label>
+          <input
+            id="edit-password"
+            type="password"
+            placeholder="Kosongkan jika tidak ingin diubah"
+            bind:value={editPassword}
+            minlength="6"
+            class="w-full px-3 py-2 bg-brand-50 border border-brand-300/60 text-warm-900 placeholder-warm-300 focus:border-brand-700 focus:ring-1 focus:ring-brand-600/30 focus:outline-none transition-colors rounded-xl text-sm mt-1"
+          />
+        </div>
+
+        <div class="flex gap-3 pt-2">
+          <button
+            type="button"
+            on:click={() => showEditModal = false}
+            class="flex-1 py-2 bg-warm-100 hover:bg-warm-200 border border-warm-300 text-warm-700 text-xs font-semibold rounded-xl cursor-pointer"
+          >
+            Batal
+          </button>
+          <button
+            type="submit"
+            disabled={submittingEdit}
+            class="flex-1 py-2 bg-brand-700 hover:bg-brand-800 disabled:bg-brand-400 text-brand-50 text-xs font-bold rounded-xl cursor-pointer shadow-md"
+          >
+            {#if submittingEdit}
+              Menyimpan...
+            {:else}
+              Simpan Perubahan
+            {/if}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+{/if}
