@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <!-- Rounded cream background matching the logo sample -->
+  <rect width="100" height="100" rx="24" fill="#f4e9bb" />
+  <!-- Calligraphy S in golden/bronze color -->
+  <path d="M 82,27 C 73,20 54,20 41,26 C 26,32 22,49 29,62 C 34,71 43,78 46,81 C 50,85 33,87 32,81 C 31,76 42,76 48,82" stroke="#bca554" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+</svg>
