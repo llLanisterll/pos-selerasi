@@ -1,13 +1,9 @@
 <script>
   import {
     categories,
-    transactions,
     addCategoryApi,
     updateCategoryApi,
     deleteCategoryApi,
-    resetDemoApi,
-    clearAllApi,
-    importDataApi,
     getCategoryStyle
   } from '../stores/expenseStore';
   import { addNotification } from '../stores/notificationStore';
@@ -121,86 +117,6 @@
     name = '';
     selectedSwatchName = 'Rose';
     editingCategoryId = null;
-  }
-
-  // Backup & Reset Functions
-  let fileInput;
-
-  function handleExport() {
-    const data = {
-      categories: $categories,
-      transactions: $transactions,
-      exportedAt: new Date().toISOString()
-    };
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data, null, 2));
-    const downloadAnchor = document.createElement('a');
-    downloadAnchor.setAttribute("href", dataStr);
-    downloadAnchor.setAttribute("download", `selerasi_cadangan_${new Date().toISOString().split('T')[0]}.json`);
-    document.body.appendChild(downloadAnchor);
-    downloadAnchor.click();
-    downloadAnchor.remove();
-
-    addNotification('Cadangan data berhasil diekspor!', 'success');
-  }
-
-  function handleImport(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = async function(evt) {
-      try {
-        const data = JSON.parse(evt.target.result);
-        if (data && Array.isArray(data.categories) && Array.isArray(data.transactions)) {
-          const ok = await importDataApi(data);
-          if (ok) {
-            addNotification('Cadangan data berhasil dipulihkan!', 'success');
-          } else {
-            addNotification('Gagal memulihkan cadangan data ke server.', 'error');
-          }
-        } else {
-          addNotification('Format file cadangan tidak valid.', 'error');
-        }
-      } catch (err) {
-        addNotification('Gagal membaca file cadangan.', 'error');
-      }
-      if (fileInput) fileInput.value = '';
-    };
-    reader.readAsText(file);
-  }
-
-  async function handleResetDemo() {
-    askConfirmation({
-      title: 'Reset ke Data Demo',
-      message: 'Apakah Anda yakin ingin mengatur ulang ke Data Simulasi Demo? Semua transaksi dan kategori Anda saat ini akan ditimpa.',
-      confirmText: 'Ya, Reset',
-      type: 'warning',
-      onConfirm: async () => {
-        const ok = await resetDemoApi();
-        if (ok) {
-          addNotification('Berhasil mengatur ulang aplikasi ke data demo!', 'success');
-        } else {
-          addNotification('Gagal mengatur ulang data demo.', 'error');
-        }
-      }
-    });
-  }
-
-  async function handleClearAll() {
-    askConfirmation({
-      title: 'Hapus Semua Data',
-      message: 'PERINGATAN: Apakah Anda yakin ingin menghapus SELURUH data keuangan? Tindakan ini akan mengosongkan seluruh kategori dan transaksi Anda secara permanen.',
-      confirmText: 'Hapus Permanen',
-      type: 'danger',
-      onConfirm: async () => {
-        const ok = await clearAllApi();
-        if (ok) {
-          addNotification('Semua data berhasil dibersihkan!', 'success');
-        } else {
-          addNotification('Gagal membersihkan data keuangan.', 'error');
-        }
-      }
-    });
   }
 
   // Reactive derived list for the table
@@ -334,85 +250,6 @@
       </div>
     </div>
 
-  </div>
-
-  <!-- Utilitas & Cadangan Data Card -->
-  <div class="bg-white/70 backdrop-blur-sm border border-brand-300/60 rounded-2xl p-6 shadow-sm">
-    <h3 class="text-sm font-semibold text-warm-900 pb-3 border-b border-brand-200/60 mb-5 flex items-center justify-between">
-      <span>Utilitas &amp; Cadangan Data</span>
-      <span class="text-[10px] bg-brand-200/70 text-warm-700 border border-brand-300 font-bold px-2 py-0.5 rounded tracking-wide uppercase">Cadangan &amp; Pemulihan</span>
-    </h3>
-
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      <!-- Export Card -->
-      <div class="border border-brand-300/60 rounded-xl p-4 flex flex-col justify-between hover:border-brand-500 hover:shadow-sm transition-colors bg-brand-50/60">
-        <div>
-          <h4 class="text-xs font-bold text-warm-800 uppercase tracking-wide">Ekspor Data</h4>
-          <p class="text-[11px] text-warm-500 mt-1">Unduh seluruh catatan transaksi dan kategori Anda sebagai file JSON cadangan.</p>
-        </div>
-        <button
-          type="button"
-          on:click={handleExport}
-          class="w-full mt-4 py-2 bg-brand-200 hover:bg-brand-300 border border-brand-400/50 text-warm-800 text-xs font-semibold rounded-lg transition-colors cursor-pointer active:scale-95 text-center"
-        >
-          Ekspor Cadangan
-        </button>
-      </div>
-
-      <!-- Import Card -->
-      <div class="border border-brand-300/60 rounded-xl p-4 flex flex-col justify-between hover:border-brand-500 hover:shadow-sm transition-colors bg-brand-50/60">
-        <div>
-          <h4 class="text-xs font-bold text-warm-800 uppercase tracking-wide">Impor Data</h4>
-          <p class="text-[11px] text-warm-500 mt-1">Unggah file JSON cadangan Selerasi untuk memulihkan seluruh riwayat keuangan Anda.</p>
-        </div>
-        <div class="mt-4">
-          <input
-            type="file"
-            accept=".json"
-            on:change={handleImport}
-            bind:this={fileInput}
-            class="hidden"
-            id="file-import-input"
-          />
-          <label
-            for="file-import-input"
-            class="block w-full py-2 bg-brand-200 hover:bg-brand-300 border border-brand-400/50 text-warm-800 text-xs font-semibold rounded-lg text-center cursor-pointer active:scale-95 transition-all"
-          >
-            Pilih &amp; Impor File
-          </label>
-        </div>
-      </div>
-
-      <!-- Reset Demo Card -->
-      <div class="border border-brand-300/60 rounded-xl p-4 flex flex-col justify-between hover:border-brand-500 hover:shadow-sm transition-colors bg-brand-50/60">
-        <div>
-          <h4 class="text-xs font-bold text-warm-800 uppercase tracking-wide">Data Demo</h4>
-          <p class="text-[11px] text-warm-500 mt-1">Kembalikan aplikasi ke konfigurasi simulasi awal dengan data contoh transaksi bawaan.</p>
-        </div>
-        <button
-          type="button"
-          on:click={handleResetDemo}
-          class="w-full mt-4 py-2 bg-brand-200 hover:bg-brand-300 border border-brand-400/50 text-warm-800 text-xs font-semibold rounded-lg transition-colors cursor-pointer active:scale-95 text-center"
-        >
-          Reset Data Demo
-        </button>
-      </div>
-
-      <!-- Clear Data Card -->
-      <div class="border border-rose-200 rounded-xl p-4 flex flex-col justify-between hover:border-rose-300 hover:bg-rose-50/50 transition-colors bg-rose-50/30">
-        <div>
-          <h4 class="text-xs font-bold text-rose-600 uppercase tracking-wide">Hapus Semua Data</h4>
-          <p class="text-[11px] text-warm-500 mt-1">Kosongkan seluruh data transaksi dan kategori agar Anda bisa mulai mencatat dari awal.</p>
-        </div>
-        <button
-          type="button"
-          on:click={handleClearAll}
-          class="w-full mt-4 py-2 bg-rose-100 hover:bg-rose-200 border border-rose-300 text-rose-600 text-xs font-bold rounded-lg transition-colors cursor-pointer active:scale-95 text-center"
-        >
-          Hapus Permanen
-        </button>
-      </div>
-    </div>
   </div>
 
 </div>

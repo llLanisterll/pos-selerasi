@@ -11,10 +11,13 @@
   import HistoryView from '../components/HistoryView.svelte';
   import SettingsView from '../components/SettingsView.svelte';
   import POSView from '../components/POSView.svelte';
+  import UserManagement from '../components/UserManagement.svelte';
 
   let activeTab = 'Dashboard';
   let isAuthenticated = false;
   let checkingSession = true;
+  let userRole = 'owner';
+  let userEmail = '';
 
   onMount(async () => {
     await checkSession();
@@ -24,14 +27,21 @@
     try {
       const res = await fetch('/api/auth/session');
       if (res.ok) {
-        isAuthenticated = true;
-        
-        // Fetch data setelah berhasil autentikasi
-        await Promise.all([
-          fetchCategories(),
-          fetchTransactions(),
-          fetchProducts()
-        ]);
+        const data = await res.json();
+        if (data.user) {
+          isAuthenticated = true;
+          userRole = data.user.user_metadata?.role || 'owner';
+          userEmail = data.user.email || '';
+
+          // Fetch data setelah berhasil autentikasi
+          await Promise.all([
+            fetchCategories(),
+            fetchTransactions(),
+            fetchProducts()
+          ]);
+        } else {
+          isAuthenticated = false;
+        }
       } else {
         isAuthenticated = false;
       }
@@ -51,6 +61,8 @@
 
   function handleLogout() {
     isAuthenticated = false;
+    userRole = 'owner';
+    userEmail = '';
   }
 </script>
 
@@ -75,7 +87,7 @@
   <!-- Render POS & Finance App (Authenticated) -->
   <div class="min-h-screen flex flex-col md:flex-row font-sans">
     <!-- Responsive Sidebar Nav -->
-    <Sidebar bind:activeTab on:logout={handleLogout} />
+    <Sidebar bind:activeTab {userRole} {userEmail} on:logout={handleLogout} />
 
     <!-- Main Content View Pane -->
     <main class="flex-grow max-w-6xl w-full mx-auto px-4 sm:px-6 md:px-8 py-8 md:py-10">
@@ -100,6 +112,11 @@
       {:else if activeTab === 'History'}
         <section class="animate-fade-in">
           <HistoryView />
+        </section>
+
+      {:else if activeTab === 'UserSettings'}
+        <section class="animate-fade-in">
+          <UserManagement />
         </section>
 
       {:else if activeTab === 'Settings'}
