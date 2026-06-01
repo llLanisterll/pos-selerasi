@@ -4,7 +4,7 @@ import { json } from "@sveltejs/kit";
 //#region src/routes/api/reset-demo/+server.js
 async function POST({ request, cookies }) {
 	try {
-		const { user, error: authError } = await authenticate(request, cookies, "superadmin");
+		const { user, error: authError } = await authenticate(request, cookies, "superadmin-strict");
 		if (authError) return json({ message: authError.message }, { status: 403 });
 		const { error: delTxErr } = await supabase.from("transactions").delete().neq("id", "dummy");
 		const { error: delCatErr } = await supabase.from("categories").delete().neq("id", "dummy");

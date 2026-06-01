@@ -1,4 +1,5 @@
 import supabase from '$lib/server/db';
+import { isMaintenanceActive } from './maintenance.js';
 
 /**
  * Memverifikasi token autentikasi dari cookies atau header Authorization, serta opsional mengecek role user.
@@ -26,11 +27,28 @@ export async function authenticate(request, cookies, requiredRole = null) {
     if (error || !user) {
       return { user: null, error: error || new Error('Sesi tidak valid atau telah kedaluwarsa.') };
     }
+
+    const userRole = user.user_metadata?.role || 'owner'; // Default ke 'owner' jika role kosong
+
+    // Cek Mode Pemeliharaan (Maintenance Mode)
+    // Hanya Superadmin yang diizinkan masuk/mengakses API selama pemeliharaan berjalan
+    if (isMaintenanceActive() && userRole !== 'superadmin') {
+      return { user: null, error: new Error('MAINTENANCE_MODE: Aplikasi sedang dalam pemeliharaan oleh Superadmin.') };
+    }
     
     // Verifikasi peran jika diperlukan
     if (requiredRole) {
-      const userRole = user.user_metadata?.role || 'owner'; // Default ke 'owner' jika role kosong
-      if (userRole !== requiredRole) {
+      if (requiredRole === 'superadmin') {
+        // Owner dan superadmin sama-sama memiliki wewenang administratif penuh
+        if (userRole !== 'superadmin' && userRole !== 'owner') {
+          return { user, error: new Error('Anda tidak memiliki izin (hak akses) untuk melakukan operasi ini.') };
+        }
+      } else if (requiredRole === 'superadmin-strict') {
+        // Hanya superadmin murni yang diperbolehkan untuk operasi database yang sangat merusak
+        if (userRole !== 'superadmin') {
+          return { user, error: new Error('Operasi ini sangat sensitif dan hanya dapat dilakukan oleh Superadmin.') };
+        }
+      } else if (userRole !== requiredRole) {
         return { user, error: new Error('Anda tidak memiliki izin (hak akses) untuk melakukan operasi ini.') };
       }
     }

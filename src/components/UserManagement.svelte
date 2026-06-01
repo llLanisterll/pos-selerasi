@@ -10,7 +10,8 @@
   import { addNotification } from '../stores/notificationStore';
   import { askConfirmation } from '../stores/confirmationStore';
 
-  // State untuk User Management
+  // State untuk User Management & Peran Aktif
+  export let userRole = 'owner';
   let users = [];
   let email = '';
   let password = '';
@@ -301,7 +302,7 @@
   <!-- View Header -->
   <div class="pb-6 border-b border-brand-300/60">
     <h1 class="text-2xl font-bold tracking-tight text-warm-900">Pengaturan User & Data</h1>
-    <p class="text-sm text-warm-500 mt-1">Halaman khusus Superadmin untuk mengelola pengguna (Owner/Admin) dan mencadangkan database.</p>
+    <p class="text-sm text-warm-500 mt-1">Halaman untuk mengelola pengguna (Owner/Admin) dan mencadangkan database.</p>
   </div>
 
   <!-- Section: Statistik Sistem -->
@@ -545,58 +546,115 @@
       </div>
 
       <!-- Import Card -->
-      <div class="border border-brand-300/60 rounded-xl p-4 flex flex-col justify-between hover:border-brand-500 hover:shadow-sm transition-colors bg-brand-50/60">
-        <div>
-          <h4 class="text-xs font-bold text-warm-800 uppercase tracking-wide">Impor Data</h4>
-          <p class="text-[11px] text-warm-500 mt-1">Unggah file JSON cadangan Selerasi untuk memulihkan seluruh riwayat keuangan Anda.</p>
+      {#if userRole === 'superadmin'}
+        <div class="border border-brand-300/60 rounded-xl p-4 flex flex-col justify-between hover:border-brand-500 hover:shadow-sm transition-colors bg-brand-50/60">
+          <div>
+            <h4 class="text-xs font-bold text-warm-800 uppercase tracking-wide">Impor Data</h4>
+            <p class="text-[11px] text-warm-500 mt-1">Unggah file JSON cadangan Selerasi untuk memulihkan seluruh riwayat keuangan Anda.</p>
+          </div>
+          <div class="mt-4">
+            <input
+              type="file"
+              accept=".json"
+              on:change={handleImport}
+              bind:this={fileInput}
+              class="hidden"
+              id="file-import-input"
+            />
+            <label
+              for="file-import-input"
+              class="block w-full py-2 bg-brand-200 hover:bg-brand-300 border border-brand-400/50 text-warm-800 text-xs font-semibold rounded-lg text-center cursor-pointer active:scale-95 transition-all"
+            >
+              Pilih &amp; Impor File
+            </label>
+          </div>
         </div>
-        <div class="mt-4">
-          <input
-            type="file"
-            accept=".json"
-            on:change={handleImport}
-            bind:this={fileInput}
-            class="hidden"
-            id="file-import-input"
-          />
-          <label
-            for="file-import-input"
-            class="block w-full py-2 bg-brand-200 hover:bg-brand-300 border border-brand-400/50 text-warm-800 text-xs font-semibold rounded-lg text-center cursor-pointer active:scale-95 transition-all"
+      {:else}
+        <div class="border border-warm-200 rounded-xl p-4 flex flex-col justify-between bg-warm-50/40 opacity-70">
+          <div>
+            <div class="flex items-center justify-between">
+              <h4 class="text-xs font-bold text-warm-400 uppercase tracking-wide">Impor Data</h4>
+              <span class="text-[9px] bg-purple-50 text-purple-700 border border-purple-200 px-1.5 py-0.5 rounded font-bold">IT</span>
+            </div>
+            <p class="text-[11px] text-warm-400 mt-1">Unggah file JSON cadangan Selerasi untuk memulihkan seluruh riwayat keuangan Anda.</p>
+          </div>
+          <button
+            disabled
+            class="w-full mt-4 py-2 bg-warm-100 border border-warm-200 text-warm-400 text-xs font-semibold rounded-lg cursor-not-allowed text-center flex items-center justify-center gap-1.5"
           >
-            Pilih &amp; Impor File
-          </label>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0V10.5m-2.25 0h13.5m-13.5 0a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25h13.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25M6.75 22.5h10.5" /></svg>
+            Butuh Superadmin
+          </button>
         </div>
-      </div>
+      {/if}
 
       <!-- Reset Demo Card -->
-      <div class="border border-brand-300/60 rounded-xl p-4 flex flex-col justify-between hover:border-brand-500 hover:shadow-sm transition-colors bg-brand-50/60">
-        <div>
-          <h4 class="text-xs font-bold text-warm-800 uppercase tracking-wide">Data Demo</h4>
-          <p class="text-[11px] text-warm-500 mt-1">Kembalikan aplikasi ke konfigurasi simulasi awal dengan data contoh transaksi bawaan.</p>
+      {#if userRole === 'superadmin'}
+        <div class="border border-brand-300/60 rounded-xl p-4 flex flex-col justify-between hover:border-brand-500 hover:shadow-sm transition-colors bg-brand-50/60">
+          <div>
+            <h4 class="text-xs font-bold text-warm-800 uppercase tracking-wide">Data Demo</h4>
+            <p class="text-[11px] text-warm-500 mt-1">Kembalikan aplikasi ke konfigurasi simulasi awal dengan data contoh transaksi bawaan.</p>
+          </div>
+          <button
+            type="button"
+            on:click={handleResetDemo}
+            class="w-full mt-4 py-2 bg-brand-200 hover:bg-brand-300 border border-brand-400/50 text-warm-800 text-xs font-semibold rounded-lg transition-colors cursor-pointer active:scale-95 text-center"
+          >
+            Reset Data Demo
+          </button>
         </div>
-        <button
-          type="button"
-          on:click={handleResetDemo}
-          class="w-full mt-4 py-2 bg-brand-200 hover:bg-brand-300 border border-brand-400/50 text-warm-800 text-xs font-semibold rounded-lg transition-colors cursor-pointer active:scale-95 text-center"
-        >
-          Reset Data Demo
-        </button>
-      </div>
+      {:else}
+        <div class="border border-warm-200 rounded-xl p-4 flex flex-col justify-between bg-warm-50/40 opacity-70">
+          <div>
+            <div class="flex items-center justify-between">
+              <h4 class="text-xs font-bold text-warm-400 uppercase tracking-wide">Data Demo</h4>
+              <span class="text-[9px] bg-purple-50 text-purple-700 border border-purple-200 px-1.5 py-0.5 rounded font-bold">IT</span>
+            </div>
+            <p class="text-[11px] text-warm-400 mt-1">Kembalikan aplikasi ke konfigurasi simulasi awal dengan data contoh transaksi bawaan.</p>
+          </div>
+          <button
+            disabled
+            class="w-full mt-4 py-2 bg-warm-100 border border-warm-200 text-warm-400 text-xs font-semibold rounded-lg cursor-not-allowed text-center flex items-center justify-center gap-1.5"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0V10.5m-2.25 0h13.5m-13.5 0a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25h13.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25M6.75 22.5h10.5" /></svg>
+            Butuh Superadmin
+          </button>
+        </div>
+      {/if}
 
       <!-- Clear Data Card -->
-      <div class="border border-rose-200 rounded-xl p-4 flex flex-col justify-between hover:border-rose-300 hover:bg-rose-50/50 transition-colors bg-rose-50/30">
-        <div>
-          <h4 class="text-xs font-bold text-rose-600 uppercase tracking-wide">Hapus Semua Data</h4>
-          <p class="text-[11px] text-warm-500 mt-1">Kosongkan seluruh data transaksi dan kategori agar Anda bisa mulai mencatat dari awal.</p>
+      {#if userRole === 'superadmin'}
+        <div class="border border-rose-200 rounded-xl p-4 flex flex-col justify-between hover:border-rose-300 hover:bg-rose-50/50 transition-colors bg-rose-50/30">
+          <div>
+            <h4 class="text-xs font-bold text-rose-600 uppercase tracking-wide">Hapus Semua Data</h4>
+            <p class="text-[11px] text-warm-500 mt-1">Kosongkan seluruh data transaksi dan kategori agar Anda bisa mulai mencatat dari awal.</p>
+          </div>
+          <button
+            type="button"
+            on:click={handleClearAll}
+            class="w-full mt-4 py-2 bg-rose-100 hover:bg-rose-200 border border-rose-300 text-rose-600 text-xs font-bold rounded-lg transition-colors cursor-pointer active:scale-95 text-center"
+          >
+            Hapus Permanen
+          </button>
         </div>
-        <button
-          type="button"
-          on:click={handleClearAll}
-          class="w-full mt-4 py-2 bg-rose-100 hover:bg-rose-200 border border-rose-300 text-rose-600 text-xs font-bold rounded-lg transition-colors cursor-pointer active:scale-95 text-center"
-        >
-          Hapus Permanen
-        </button>
-      </div>
+      {:else}
+        <div class="border border-warm-200 rounded-xl p-4 flex flex-col justify-between bg-warm-50/40 opacity-70">
+          <div>
+            <div class="flex items-center justify-between">
+              <h4 class="text-xs font-bold text-warm-400 uppercase tracking-wide">Hapus Semua Data</h4>
+              <span class="text-[9px] bg-purple-50 text-purple-700 border border-purple-200 px-1.5 py-0.5 rounded font-bold">IT</span>
+            </div>
+            <p class="text-[11px] text-warm-400 mt-1">Kosongkan seluruh data transaksi dan kategori agar Anda bisa mulai mencatat dari awal.</p>
+          </div>
+          <button
+            disabled
+            class="w-full mt-4 py-2 bg-warm-100 border border-warm-200 text-warm-400 text-xs font-semibold rounded-lg cursor-not-allowed text-center flex items-center justify-center gap-1.5"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0V10.5m-2.25 0h13.5m-13.5 0a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25h13.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25M6.75 22.5h10.5" /></svg>
+            Butuh Superadmin
+          </button>
+        </div>
+      {/if}
     </div>
   </div>
 </div>

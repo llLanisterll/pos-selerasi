@@ -144,47 +144,6 @@
     });
   }
 
-  // ─── Quick Add Form ───────────────────────────────────────────────────────
-  let showForm = false;
-  let formDesc = '';
-  let formAmount = '';
-  let formCategory = '';
-  let formDate = todayStr();
-  let formPayment = 'Tunai';
-  let formQty = 1;
-  let formLoading = false;
-  let formSuccess = false;
-
-  $: expenseCats = $categories.filter(c => c.type === 'expense');
-  $: {
-    if (expenseCats.length > 0 && !formCategory) {
-      formCategory = expenseCats[0].name;
-    }
-  }
-
-  async function submitForm(e) {
-    e.preventDefault();
-    if (!formAmount || Number(formAmount) <= 0) return alert('Nominal tidak valid.');
-    if (!formDesc.trim()) return alert('Isi deskripsi.');
-    formLoading = true;
-    try {
-      await addTransactionApi({
-        id: Date.now().toString(),
-        description: formDesc.trim(),
-        amount: Number(formAmount),
-        type: 'expense',
-        category: formCategory || 'Operasional',
-        date: formDate,
-        quantity: Number(formQty) || 1,
-        payment_method: formPayment,
-      });
-      formDesc = ''; formAmount = ''; formQty = 1; formDate = todayStr();
-      addNotification('Pengeluaran berhasil disimpan!', 'success');
-    } catch(e) {
-      addNotification('Gagal: ' + e.message, 'error');
-    }
-    formLoading = false;
-  }
 </script>
 
 <div class="space-y-6 animate-fade-in">
@@ -206,86 +165,15 @@
     </div>
 
     <button
-      on:click={() => showForm = !showForm}
+      on:click={() => activeTab = 'ExpenseEntry'}
       class="inline-flex items-center gap-2 px-4 py-2.5 bg-brand-700 hover:bg-brand-800 active:scale-[0.98] text-white text-xs font-bold rounded-xl shadow-md transition-all duration-150 cursor-pointer self-start sm:self-auto"
     >
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4">
         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
       </svg>
-      {showForm ? 'Tutup Form' : 'Catat Pengeluaran'}
+      Catat Pengeluaran
     </button>
   </div>
-
-  {#if showForm}
-    <div class="bg-white/80 backdrop-blur-sm border border-brand-300/60 rounded-2xl p-5 shadow-md animate-fade-in">
-      <h2 class="text-sm font-bold text-warm-900 mb-4 flex items-center gap-2">
-        <span class="w-5 h-5 bg-rose-500/20 border border-rose-400/50 rounded-md flex items-center justify-center">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5 text-rose-800">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12h-15" />
-          </svg>
-        </span>
-        Catat Pengeluaran Baru
-      </h2>
-
-      <form on:submit={submitForm} class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-        <div class="sm:col-span-2 lg:col-span-1 space-y-1">
-          <label for="dash-desc" class="text-xs font-medium text-warm-600">Deskripsi</label>
-          <input id="dash-desc" type="text" bind:value={formDesc} placeholder="Contoh: Belanja bahan baku..." required
-            class="w-full px-3 py-2 bg-brand-50 border border-brand-300/60 text-warm-900 placeholder-warm-300 focus:border-brand-700 focus:outline-none rounded-xl text-xs" />
-        </div>
-
-        <div class="space-y-1">
-          <label for="dash-amount" class="text-xs font-medium text-warm-600">Nominal (Rp)</label>
-          <div class="relative">
-            <span class="absolute left-3 top-2.5 text-xs text-warm-400 font-semibold">Rp</span>
-            <input id="dash-amount" type="number" bind:value={formAmount} min="1" placeholder="0" required
-              class="w-full pl-9 pr-3 py-2 bg-brand-50 border border-brand-300/60 text-warm-900 placeholder-warm-300 focus:border-brand-700 focus:outline-none rounded-xl text-xs" />
-          </div>
-        </div>
-
-        <div class="space-y-1">
-          <label for="dash-category" class="text-xs font-medium text-warm-600">Kategori</label>
-          <select id="dash-category" bind:value={formCategory} required
-            class="w-full px-3 py-2 bg-brand-50 border border-brand-300/60 text-warm-900 focus:border-brand-700 focus:outline-none rounded-xl text-xs">
-            {#each expenseCats as cat}
-              <option value={cat.name}>{cat.name}</option>
-            {/each}
-            {#if expenseCats.length === 0}
-              <option value="Operasional">Operasional</option>
-            {/if}
-          </select>
-        </div>
-
-        <div class="space-y-1">
-          <label for="dash-payment" class="text-xs font-medium text-warm-600">Pembayaran</label>
-          <select id="dash-payment" bind:value={formPayment} required
-            class="w-full px-3 py-2 bg-brand-50 border border-brand-300/60 text-warm-900 focus:border-brand-700 focus:outline-none rounded-xl text-xs">
-            <option value="Tunai">Tunai</option>
-            <option value="Transfer Bank">Transfer Bank</option>
-          </select>
-        </div>
-
-        <div class="space-y-1">
-          <label for="dash-date" class="text-xs font-medium text-warm-600">Tanggal</label>
-          <input id="dash-date" type="date" bind:value={formDate} required
-            class="w-full px-3 py-2 bg-brand-50 border border-brand-300/60 text-warm-900 focus:border-brand-700 focus:outline-none rounded-xl text-xs" />
-        </div>
-
-        <div class="space-y-1">
-          <label for="dash-qty" class="text-xs font-medium text-warm-600">Jumlah Unit</label>
-          <input id="dash-qty" type="number" bind:value={formQty} min="1" placeholder="1" required
-            class="w-full px-3 py-2 bg-brand-50 border border-brand-300/60 text-warm-900 placeholder-warm-300 focus:border-brand-700 focus:outline-none rounded-xl text-xs" />
-        </div>
-
-        <div class="flex items-end sm:col-span-2 lg:col-span-3">
-          <button type="submit" disabled={formLoading}
-            class="w-full py-2.5 bg-brand-700 hover:bg-brand-800 disabled:opacity-60 active:scale-[0.99] text-white text-xs font-bold rounded-xl transition-all duration-150 cursor-pointer shadow-md">
-            {formLoading ? 'Menyimpan...' : 'Simpan Pengeluaran'}
-          </button>
-        </div>
-      </form>
-    </div>
-  {/if}
 
   <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
     <div class="col-span-2 md:col-span-1 bg-white/80 backdrop-blur-sm border {$totalBalance < 0 ? 'border-rose-200 bg-rose-50/60' : 'border-brand-300/60'} rounded-2xl p-5 shadow-sm">

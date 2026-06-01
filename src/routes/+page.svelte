@@ -7,6 +7,7 @@
   import Login from '../components/Login.svelte';
   import Dashboard from '../components/Dashboard.svelte';
   import FinancialReport from '../components/FinancialReport.svelte';
+  import ExpenseEntry from '../components/ExpenseEntry.svelte';
   import ProductManagement from '../components/ProductManagement.svelte';
   import HistoryView from '../components/HistoryView.svelte';
   import SettingsView from '../components/SettingsView.svelte';
@@ -14,14 +15,34 @@
   import UserManagement from '../components/UserManagement.svelte';
   import StoreSettings from '../components/StoreSettings.svelte';
   import ActivityLogs from '../components/ActivityLogs.svelte';
+  import SystemHealth from '../components/SystemHealth.svelte';
 
   let activeTab = 'Dashboard';
   let isAuthenticated = false;
   let checkingSession = true;
   let userRole = 'owner';
   let userEmail = '';
+  let isSystemMaintenance = false;
 
   onMount(async () => {
+    // Intercept global fetch to detect maintenance mode errors
+    const originalFetch = window.fetch;
+    window.fetch = async (...args) => {
+      const response = await originalFetch(...args);
+      if (!response.ok) {
+        try {
+          const clone = response.clone();
+          const data = await clone.json();
+          if (data.message && data.message.includes('MAINTENANCE_MODE')) {
+            isSystemMaintenance = true;
+          }
+        } catch (e) {
+          // Ignore non-json responses
+        }
+      }
+      return response;
+    };
+
     await checkSession();
   });
 
@@ -45,7 +66,12 @@
           isAuthenticated = false;
         }
       } else {
-        isAuthenticated = false;
+        const errData = await res.json().catch(() => ({}));
+        if (errData.message && errData.message.includes('MAINTENANCE_MODE')) {
+          isSystemMaintenance = true;
+        } else {
+          isAuthenticated = false;
+        }
       }
     } catch (err) {
       console.error('Error checking session:', err);
@@ -68,7 +94,39 @@
   }
 </script>
 
-{#if checkingSession}
+{#if isSystemMaintenance}
+  <!-- Render Maintenance Screen -->
+  <div class="min-h-screen w-full flex flex-col items-center justify-center bg-gradient-to-tr from-amber-50 via-warm-50 to-orange-50/50 font-sans p-6 text-center">
+    <div class="max-w-md w-full bg-white/80 backdrop-blur-md border border-amber-200 p-8 rounded-3xl shadow-xl space-y-6">
+      <div class="relative flex items-center justify-center">
+        <!-- Pulsing Orange Glow Ring -->
+        <div class="absolute w-20 h-20 rounded-full bg-amber-500/10 animate-ping"></div>
+        <div class="w-16 h-16 rounded-2xl bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center shadow-sm">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8"><path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17 17.25 21A2.67 2.67 0 1 1 13.5 22.5l-5.83-5.83M11.42 15.17 6.25 10A2.67 2.67 0 1 1 10 6.25l5.17 5.17m-3.75 3.75 3.75-3.75M21 21a2.67 2.67 0 0 0-3.75-3.75M3 3a2.67 2.67 0 0 0 3.75 3.75" /></svg>
+        </div>
+      </div>
+      <div class="space-y-2">
+        <h2 class="text-xl font-bold text-warm-900">Sistem Dalam Pemeliharaan</h2>
+        <p class="text-xs text-warm-500 leading-relaxed font-medium">
+          Aplikasi Selerasi sedang dinonaktifkan sementara oleh Superadmin untuk pemeliharaan rutin database dan optimalisasi sistem.
+        </p>
+      </div>
+      <div class="p-3 bg-amber-50/50 border border-amber-200/50 rounded-xl">
+        <p class="text-[10px] font-bold text-amber-800 uppercase tracking-wide">Estimasi Selesai</p>
+        <p class="text-xs text-amber-700 font-semibold mt-0.5">Segera Kembali (Kurang dari 30 menit)</p>
+      </div>
+      <div class="pt-4 border-t border-brand-200/60">
+        <button
+          on:click={() => { isSystemMaintenance = false; checkSession(); }}
+          class="w-full py-2.5 bg-warm-900 hover:bg-black text-brand-50 text-xs font-bold rounded-xl transition duration-150 shadow cursor-pointer"
+        >
+          Muat Ulang Aplikasi
+        </button>
+      </div>
+    </div>
+  </div>
+
+{:else if checkingSession}
   <!-- Loading Session Screen -->
   <div class="min-h-screen w-full flex flex-col items-center justify-center bg-gradient-to-tr from-brand-100 via-warm-50 to-brand-50/50 font-sans">
     <div class="relative flex items-center justify-center">
@@ -108,6 +166,11 @@
           <POSView />
         </section>
 
+      {:else if activeTab === 'ExpenseEntry'}
+        <section class="animate-fade-in">
+          <ExpenseEntry />
+        </section>
+
       {:else if activeTab === 'FinancialReport'}
         <section class="animate-fade-in">
           <FinancialReport />
@@ -125,7 +188,7 @@
 
       {:else if activeTab === 'UserSettings'}
         <section class="animate-fade-in">
-          <UserManagement />
+          <UserManagement {userRole} />
         </section>
 
       {:else if activeTab === 'StoreSettings'}
@@ -136,6 +199,11 @@
       {:else if activeTab === 'ActivityLogs'}
         <section class="animate-fade-in">
           <ActivityLogs />
+        </section>
+
+      {:else if activeTab === 'SystemHealth'}
+        <section class="animate-fade-in">
+          <SystemHealth />
         </section>
 
       {:else if activeTab === 'Settings'}

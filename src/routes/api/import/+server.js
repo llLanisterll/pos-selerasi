@@ -5,7 +5,7 @@ import { json } from '@sveltejs/kit';
 export async function POST({ request, cookies }) {
   try {
     // Hanya superadmin yang dapat melakukan impor data cadangan
-    const { user, error: authError } = await authenticate(request, cookies, 'superadmin');
+    const { user, error: authError } = await authenticate(request, cookies, 'superadmin-strict');
     if (authError) {
       return json({ message: authError.message }, { status: 403 });
     }

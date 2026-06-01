@@ -71,8 +71,11 @@ export async function PUT({ params, request, cookies }) {
     }
 
     // Cegah mengunci/menurunkan peran diri sendiri
-    if (currentAdmin.id === id && role && role !== 'superadmin') {
-      return json({ message: 'Anda tidak dapat menurunkan peran (demote) akun Anda sendiri.' }, { status: 400 });
+    const currentRole = currentAdmin.user_metadata?.role || 'owner';
+    if (currentAdmin.id === id && role && role !== currentRole) {
+      if (currentRole === 'superadmin' && role === 'owner') {
+        return json({ message: 'Anda tidak dapat menurunkan peran (demote) akun Anda sendiri.' }, { status: 400 });
+      }
     }
 
     // Ambil info user sebelum diperbarui untuk kebutuhan logging

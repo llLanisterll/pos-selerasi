@@ -17,6 +17,12 @@ export async function POST({ request, cookies }) {
     if (error) {
       return json({ message: error.message }, { status: 401 });
     }
+
+    const userRole = data.user.user_metadata?.role || 'owner';
+    const { isMaintenanceActive } = await import('$lib/server/maintenance');
+    if (isMaintenanceActive() && userRole !== 'superadmin') {
+      return json({ message: 'MAINTENANCE_MODE: Aplikasi sedang dalam pemeliharaan oleh Superadmin.' }, { status: 503 });
+    }
     
     const session = data.session;
     

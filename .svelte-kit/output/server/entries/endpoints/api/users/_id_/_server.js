@@ -35,7 +35,10 @@ async function PUT({ params, request, cookies }) {
 			if (password.length < 6) return json({ message: "Password minimal 6 karakter." }, { status: 400 });
 			updateData.password = password;
 		}
-		if (currentAdmin.id === id && role && role !== "superadmin") return json({ message: "Anda tidak dapat menurunkan peran (demote) akun Anda sendiri." }, { status: 400 });
+		const currentRole = currentAdmin.user_metadata?.role || "owner";
+		if (currentAdmin.id === id && role && role !== currentRole) {
+			if (currentRole === "superadmin" && role === "owner") return json({ message: "Anda tidak dapat menurunkan peran (demote) akun Anda sendiri." }, { status: 400 });
+		}
 		const { data: { user: userToUpdate } } = await supabaseAdmin.auth.admin.getUserById(id);
 		const targetEmail = userToUpdate?.email || id;
 		const { data: { user }, error } = await supabaseAdmin.auth.admin.updateUserById(id, updateData);

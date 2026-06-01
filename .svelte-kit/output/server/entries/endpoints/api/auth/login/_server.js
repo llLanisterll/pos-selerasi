@@ -10,6 +10,9 @@ async function POST({ request, cookies }) {
 			password
 		});
 		if (error) return json({ message: error.message }, { status: 401 });
+		const userRole = data.user.user_metadata?.role || "owner";
+		const { isMaintenanceActive } = await import("../../../../../chunks/maintenance.js");
+		if (isMaintenanceActive() && userRole !== "superadmin") return json({ message: "MAINTENANCE_MODE: Aplikasi sedang dalam pemeliharaan oleh Superadmin." }, { status: 503 });
 		const session = data.session;
 		cookies.set("session", session.access_token, {
 			path: "/",
