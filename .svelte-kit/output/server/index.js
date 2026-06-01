@@ -1,9 +1,9 @@
+import { N as readable, P as writable } from "./chunks/index-server.js";
 import { _ as text_encoder, a as split_remote_key, g as get_relative_path, h as base64_encode, i as parse_remote_arg, m as normalize_error, n as TRAILING_SLASH_PARAM, o as stringify, p as get_status, r as create_remote_key, t as INVALIDATED_PARAM, v as noop, y as once } from "./chunks/shared.js";
 import { a as app_dir, c as override, l as reset, o as assets, s as base } from "./chunks/environment.js";
 import { D as PAGE_METHODS, T as ENDPOINT_METHODS, _ as negotiate, a as get_global_name, b as deserialize_binary_form, c as handle_fatal_error, d as redirect_response, f as serialize_uses, g as is_form_content_type, h as s, i as format_server_error, l as has_prerendered_path, m as escape_html, o as get_node_type, p as static_error_page, r as create_replacer, s as handle_error_and_jsonify, t as clarify_devalue_error, u as method_not_allowed } from "./chunks/utils.js";
 import { i as set_public_env, n as public_env, r as set_private_env } from "./chunks/shared-server.js";
 import { _ as has_data_suffix, b as strip_resolution_suffix, d as make_trackable, f as normalize_path, g as add_resolution_suffix, h as add_data_suffix, i as validate_page_server_exports, l as decode_pathname, m as noop_span, n as validate_layout_server_exports, o as find_route, p as resolve, r as validate_page_exports, s as hash, t as validate_layout_exports, u as disable_search, v as has_resolution_suffix, x as compact, y as strip_data_suffix } from "./chunks/exports.js";
-import { A as writable, k as readable } from "./chunks/dev.js";
 import "./chunks/index-server2.js";
 import { a as set_read_implementation, i as set_manifest, n as options, r as read_implementation, t as get_hooks } from "./chunks/internal.js";
 import { error, isRedirect, json, text } from "@sveltejs/kit";

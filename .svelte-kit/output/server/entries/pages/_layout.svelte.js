@@ -1,5 +1,5 @@
-import { H as attr, U as escape_html, c as store_get, l as stringify, n as attr_class, o as ensure_array_like, u as unsubscribe_stores } from "../../chunks/dev.js";
-import { r as notifications, t as confirmation } from "../../chunks/confirmationStore.js";
+import { K as attr, f as store_get, m as unsubscribe_stores, o as attr_class, p as stringify, q as escape_html, u as ensure_array_like } from "../../chunks/index-server.js";
+import { i as confirmation, o as notifications } from "../../chunks/pwaStore.js";
 //#region src/components/NotificationToast.svelte
 function NotificationToast($$renderer, $$props) {
 	$$renderer.component(($$renderer) => {
@@ -69,13 +69,15 @@ function ConfirmationModal($$renderer, $$props) {
 //#endregion
 //#region src/routes/+layout.svelte
 function _layout($$renderer, $$props) {
-	let { children } = $$props;
-	children($$renderer);
-	$$renderer.push(`<!----> `);
-	NotificationToast($$renderer, {});
-	$$renderer.push(`<!----> `);
-	ConfirmationModal($$renderer, {});
-	$$renderer.push(`<!---->`);
+	$$renderer.component(($$renderer) => {
+		let { children } = $$props;
+		children($$renderer);
+		$$renderer.push(`<!----> `);
+		NotificationToast($$renderer, {});
+		$$renderer.push(`<!----> `);
+		ConfirmationModal($$renderer, {});
+		$$renderer.push(`<!---->`);
+	});
 }
 //#endregion
 export { _layout as default };

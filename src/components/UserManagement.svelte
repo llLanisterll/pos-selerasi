@@ -9,6 +9,7 @@
   } from '../stores/expenseStore';
   import { addNotification } from '../stores/notificationStore';
   import { askConfirmation } from '../stores/confirmationStore';
+  import { isInstallable, isInstalled, triggerInstall } from '../stores/pwaStore.js';
 
   // State untuk User Management & Peran Aktif
   export let userRole = 'owner';
@@ -296,6 +297,13 @@
       }
     });
   }
+
+  async function handleInstallApp() {
+    const success = await triggerInstall();
+    if (success) {
+      addNotification('Aplikasi berhasil dipasang di perangkat Anda!', 'success');
+    }
+  }
 </script>
 
 <div class="space-y-6 animate-fade-in">
@@ -508,7 +516,51 @@
       <span class="text-[10px] bg-brand-200/70 text-warm-700 border border-brand-300 font-bold px-2 py-0.5 rounded tracking-wide uppercase">Cadangan &amp; Pemulihan</span>
     </h3>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <!-- PWA Install Card -->
+      <div class="border border-brand-300/60 rounded-xl p-4 flex flex-col justify-between hover:border-brand-500 hover:shadow-sm transition-all duration-200 bg-brand-50/60 shadow-sm">
+        <div>
+          <div class="flex items-center justify-between">
+            <h4 class="text-xs font-bold text-warm-800 uppercase tracking-wide">Instal Aplikasi (APK)</h4>
+            {#if $isInstalled}
+              <span class="text-[9px] bg-emerald-50 text-emerald-700 border border-emerald-200 px-1.5 py-0.5 rounded font-bold uppercase">Terpasang</span>
+            {:else if $isInstallable}
+              <span class="text-[9px] bg-brand-200 text-brand-800 border border-brand-300 px-1.5 py-0.5 rounded font-bold uppercase animate-pulse">Siap Pasang</span>
+            {:else}
+              <span class="text-[9px] bg-warm-100 text-warm-500 border border-warm-200 px-1.5 py-0.5 rounded font-bold uppercase">Web Mode</span>
+            {/if}
+          </div>
+          <p class="text-[11px] text-warm-500 mt-2 leading-relaxed">
+            {#if $isInstalled}
+              Aplikasi Selerasi sudah berjalan dalam mode native (standalone) di perangkat Anda.
+            {:else if $isInstallable}
+              Unduh Selerasi seperti aplikasi APK di Android atau komputer Anda agar dapat diakses lebih cepat dari home screen.
+            {:else}
+              Untuk menginstal di Android: buka menu Chrome (titik tiga di kanan atas) lalu pilih <b>"Instal aplikasi"</b> atau <b>"Tambahkan ke Layar Utama"</b>. Untuk iOS (Safari): ketuk tombol <b>Share</b> lalu pilih <b>"Add to Home Screen"</b>.
+            {/if}
+          </p>
+        </div>
+        {#if $isInstalled}
+          <div class="w-full mt-4 py-2 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold rounded-lg text-center flex items-center justify-center gap-1.5 select-none">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+            Aplikasi Aktif
+          </div>
+        {:else if $isInstallable}
+          <button
+            type="button"
+            on:click={handleInstallApp}
+            class="w-full mt-4 py-2 bg-brand-700 hover:bg-brand-800 active:scale-[0.98] text-brand-50 text-xs font-bold rounded-lg transition-all cursor-pointer text-center flex items-center justify-center gap-1.5 shadow-sm"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
+            Unduh Aplikasi
+          </button>
+        {:else}
+          <div class="w-full mt-4 py-2 bg-warm-100 border border-warm-200 text-warm-400 text-xs font-semibold rounded-lg text-center flex items-center justify-center gap-1.5 select-none">
+            Gunakan Chrome / Safari
+          </div>
+        {/if}
+      </div>
+
       <!-- Export Card -->
       <div class="border border-brand-300/60 rounded-xl p-4 flex flex-col justify-between hover:border-brand-500 hover:shadow-sm transition-colors bg-brand-50/60">
         <div>

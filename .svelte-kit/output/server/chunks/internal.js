@@ -1,6 +1,5 @@
-import "./index-server.js";
+import { $ as define_property, A as boundary, B as set_hydrate_node, C as clear_text_content, D as init_operations, E as get_next_sibling, F as component_context, G as hydration_failed, H as hydration_mismatch, I as pop, J as HYDRATION_ERROR, L as push, O as mutable_source, Q as array_from, R as hydrate_node, S as component_root, T as get_first_child, V as set_hydrating, X as LEGACY_PROPS, Y as async_mode_flag, _ as active_effect, b as set_active_effect, d as render, g as is_passive_event, it as setContext, j as flushSync, k as set, l as derived, v as active_reaction, w as create_text, x as set_active_reaction, y as get, z as hydrating } from "./index-server.js";
 import "./environment.js";
-import { C as init_operations, D as flushSync, E as boundary, F as hydrating, I as set_hydrate_node, J as LEGACY_PROPS, K as async_mode_flag, L as set_hydrating, M as pop, N as push, P as hydrate_node, R as hydration_mismatch, S as get_next_sibling, T as set, V as hydration_failed, W as HYDRATION_ERROR, X as array_from, Z as define_property, _ as set_active_reaction, a as derived, at as setContext, b as create_text, f as is_passive_event, g as set_active_effect, h as get, j as component_context, m as active_reaction, p as active_effect, s as render, v as component_root, w as mutable_source, x as get_first_child, y as clear_text_content } from "./dev.js";
 //#region \0virtual:__sveltekit/server
 var read_implementation = null;
 function set_read_implementation(fn) {
@@ -558,14 +557,14 @@ var options = {
 	hooks: null,
 	preload_strategy: "modulepreload",
 	root: asClassComponent(Root),
-	service_worker: false,
+	service_worker: true,
 	service_worker_options: void 0,
 	server_error_boundaries: false,
 	templates: {
-		app: ({ head, body, assets, nonce, env }) => "<!DOCTYPE html>\n<html lang=\"en\">\n	<head>\n		<meta charset=\"utf-8\" />\n		<link rel=\"icon\" href=\"" + assets + "/favicon.svg\" />\n		<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n		" + head + "\n	</head>\n	<body data-sveltekit-preload-data=\"hover\">\n		<div style=\"display: contents\">" + body + "</div>\n	</body>\n</html>\n",
+		app: ({ head, body, assets, nonce, env }) => "<!DOCTYPE html>\n<html lang=\"en\">\n	<head>\n		<meta charset=\"utf-8\" />\n		<link rel=\"icon\" href=\"" + assets + "/favicon.svg\" />\n		<link rel=\"manifest\" href=\"" + assets + "/manifest.webmanifest\" />\n		<meta name=\"theme-color\" content=\"#f4e9bb\" />\n		<meta name=\"mobile-web-app-capable\" content=\"yes\" />\n		<meta name=\"apple-mobile-web-app-capable\" content=\"yes\" />\n		<meta name=\"apple-mobile-web-app-status-bar-style\" content=\"default\" />\n		<meta name=\"apple-mobile-web-app-title\" content=\"Selerasi\" />\n		<link rel=\"apple-touch-icon\" href=\"" + assets + "/icon-192.png\" />\n		<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n		" + head + "\n	</head>\n	<body data-sveltekit-preload-data=\"hover\">\n		<div style=\"display: contents\">" + body + "</div>\n	</body>\n</html>\n",
 		error: ({ status, message }) => "<!doctype html>\n<html lang=\"en\">\n	<head>\n		<meta charset=\"utf-8\" />\n		<title>" + message + "</title>\n\n		<style>\n			body {\n				--bg: white;\n				--fg: #222;\n				--divider: #ccc;\n				background: var(--bg);\n				color: var(--fg);\n				font-family:\n					system-ui,\n					-apple-system,\n					BlinkMacSystemFont,\n					'Segoe UI',\n					Roboto,\n					Oxygen,\n					Ubuntu,\n					Cantarell,\n					'Open Sans',\n					'Helvetica Neue',\n					sans-serif;\n				display: flex;\n				align-items: center;\n				justify-content: center;\n				height: 100vh;\n				margin: 0;\n			}\n\n			.error {\n				display: flex;\n				align-items: center;\n				max-width: 32rem;\n				margin: 0 1rem;\n			}\n\n			.status {\n				font-weight: 200;\n				font-size: 3rem;\n				line-height: 1;\n				position: relative;\n				top: -0.05rem;\n			}\n\n			.message {\n				border-left: 1px solid var(--divider);\n				padding: 0 0 0 1rem;\n				margin: 0 0 0 1rem;\n				min-height: 2.5rem;\n				display: flex;\n				align-items: center;\n			}\n\n			.message h1 {\n				font-weight: 400;\n				font-size: 1em;\n				margin: 0;\n			}\n\n			@media (prefers-color-scheme: dark) {\n				body {\n					--bg: #222;\n					--fg: #ddd;\n					--divider: #666;\n				}\n			}\n		</style>\n	</head>\n	<body>\n		<div class=\"error\">\n			<span class=\"status\">" + status + "</span>\n			<div class=\"message\">\n				<h1>" + message + "</h1>\n			</div>\n		</div>\n	</body>\n</html>\n"
 	},
-	version_hash: "139gzrz"
+	version_hash: "1t0r8ut"
 };
 async function get_hooks() {
 	let handle;

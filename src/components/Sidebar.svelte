@@ -1,5 +1,6 @@
 <script>
   import { createEventDispatcher } from 'svelte';
+  import { isInstallable, triggerInstall } from '../stores/pwaStore.js';
   
   export let activeTab = 'Dashboard';
   export let userRole = 'owner';
@@ -100,6 +101,10 @@
     } catch (err) {
       console.error('Logout error:', err);
     }
+  }
+
+  async function handleInstallApp() {
+    await triggerInstall();
   }
 </script>
 
@@ -222,6 +227,25 @@
       {/each}
     </nav>
   </div>
+
+  <!-- PWA Install Prompt Banner in Sidebar -->
+  {#if $isInstallable}
+    <div class="px-3 pb-2 transition-all duration-300">
+      <button
+        type="button"
+        on:click={handleInstallApp}
+        class="w-full flex items-center justify-center bg-brand-700 hover:bg-brand-800 text-brand-50 rounded-xl transition duration-150 active:scale-95 shadow-sm border border-brand-800/20 py-2.5 {isCollapsed ? 'px-2' : 'px-4 space-x-2'}"
+        title="Pasang Aplikasi Selerasi"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4 shrink-0">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+        </svg>
+        {#if !isCollapsed}
+          <span class="text-xs font-bold tracking-wide animate-fade-in whitespace-nowrap">Unduh Aplikasi</span>
+        {/if}
+      </button>
+    </div>
+  {/if}
 
   <!-- Profile & Business Info Footer -->
   <div class="border-t border-brand-300/40 bg-brand-200/40 shrink-0 transition-all duration-300 {isCollapsed ? 'p-2' : 'p-3'}">

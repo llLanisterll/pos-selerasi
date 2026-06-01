@@ -1,2 +1,2 @@
-import "./dev.js";
+import "./index-server.js";
 export {};
