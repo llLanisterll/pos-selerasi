@@ -81,13 +81,7 @@
   }
 </script>
 
-<div class="space-y-8 animate-fade-in">
-  <!-- View Header -->
-  <div class="pb-6 border-b border-brand-300/60">
-    <h1 class="text-2xl font-bold tracking-tight text-warm-900">Pengaturan Toko & Pajak</h1>
-    <p class="text-sm text-warm-500 mt-1">Konfigurasikan profil toko, tarif pajak PPN, dan biaya operasional layanan untuk perhitungan POS.</p>
-  </div>
-
+<div class="space-y-6 animate-fade-in">
   {#if loading}
     <div class="py-20 flex flex-col items-center justify-center text-warm-400 gap-2">
       <svg class="animate-spin h-6 w-6 text-brand-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

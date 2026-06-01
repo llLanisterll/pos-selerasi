@@ -12,8 +12,6 @@
   import HistoryView from '../components/HistoryView.svelte';
   import SettingsView from '../components/SettingsView.svelte';
   import POSView from '../components/POSView.svelte';
-  import UserManagement from '../components/UserManagement.svelte';
-  import StoreSettings from '../components/StoreSettings.svelte';
   import ActivityLogs from '../components/ActivityLogs.svelte';
   import SystemHealth from '../components/SystemHealth.svelte';
 
@@ -186,19 +184,16 @@
           <HistoryView />
         </section>
 
-      {:else if activeTab === 'UserSettings'}
-        <section class="animate-fade-in">
-          <UserManagement {userRole} />
-        </section>
-
-      {:else if activeTab === 'StoreSettings'}
-        <section class="animate-fade-in">
-          <StoreSettings />
-        </section>
-
       {:else if activeTab === 'ActivityLogs'}
         <section class="animate-fade-in">
-          <ActivityLogs />
+          {#if userRole === 'superadmin'}
+            <ActivityLogs />
+          {:else}
+            <div class="bg-white/70 backdrop-blur-sm border border-brand-300/60 rounded-2xl p-8 text-center max-w-md mx-auto my-12 shadow-sm space-y-4">
+              <div class="text-rose-500 font-bold text-lg">Akses Ditolak</div>
+              <p class="text-xs text-warm-500 font-medium">Halaman Log Aktivitas Sistem hanya dapat diakses oleh peran Superadmin.</p>
+            </div>
+          {/if}
         </section>
 
       {:else if activeTab === 'SystemHealth'}
@@ -208,7 +203,7 @@
 
       {:else if activeTab === 'Settings'}
         <section class="animate-fade-in">
-          <SettingsView />
+          <SettingsView {userRole} />
         </section>
       {/if}
     </main>

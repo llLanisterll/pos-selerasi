@@ -8,6 +8,11 @@
   } from '../stores/expenseStore';
   import { addNotification } from '../stores/notificationStore';
   import { askConfirmation } from '../stores/confirmationStore';
+  import StoreSettings from './StoreSettings.svelte';
+  import UserManagement from './UserManagement.svelte';
+
+  export let userRole = 'owner';
+  let activeSettingTab = 'store'; // 'store' | 'category' | 'user'
 
   // State fields
   let name = '';
@@ -123,133 +128,172 @@
   $: expenseCategories = $categories.filter(c => c.type === 'expense');
 </script>
 
-<div class="space-y-8 animate-fade-in">
+<div class="space-y-6 animate-fade-in">
   <!-- View Header -->
   <div class="pb-6 border-b border-brand-300/60">
-    <h1 class="text-2xl font-bold tracking-tight text-warm-900">Pengaturan Kategori Pengeluaran</h1>
-    <p class="text-sm text-warm-500 mt-1">Kelola daftar kategori untuk merincikan setiap pengeluaran operasional Selerasi.</p>
+    <h1 class="text-2xl font-bold tracking-tight text-warm-900">Pengaturan Aplikasi</h1>
+    <p class="text-sm text-warm-500 mt-1">Konfigurasikan profil bisnis, kategori keuangan, akun pengguna, dan cadangan database Selerasi.</p>
   </div>
 
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
-    
-    <!-- Left Column: CRUD Form -->
-    <div class="bg-white/70 backdrop-blur-sm border border-brand-300/60 rounded-2xl p-6 md:col-span-1 shadow-sm">
-      <h3 class="text-sm font-semibold text-warm-900 pb-3 border-b border-brand-200/60 mb-5">
-        {editingCategoryId ? 'Edit Kategori Pengeluaran' : 'Buat Kategori Baru'}
-      </h3>
+  <!-- Settings Switcher Tabs -->
+  <div class="flex border-b border-brand-200 gap-8">
+    <button
+      on:click={() => activeSettingTab = 'store'}
+      class="pb-4 text-sm font-bold transition-all relative
+        {activeSettingTab === 'store' ? 'text-brand-800' : 'text-warm-400 hover:text-warm-600 cursor-pointer'}"
+    >
+      Profil & Pajak Toko
+      {#if activeSettingTab === 'store'}
+        <div class="absolute bottom-0 left-0 right-0 h-1 bg-brand-700 rounded-t-full"></div>
+      {/if}
+    </button>
+    <button
+      on:click={() => activeSettingTab = 'category'}
+      class="pb-4 text-sm font-bold transition-all relative
+        {activeSettingTab === 'category' ? 'text-brand-800' : 'text-warm-400 hover:text-warm-600 cursor-pointer'}"
+    >
+      Kategori Pengeluaran
+      {#if activeSettingTab === 'category'}
+        <div class="absolute bottom-0 left-0 right-0 h-1 bg-brand-700 rounded-t-full"></div>
+      {/if}
+    </button>
+    <button
+      on:click={() => activeSettingTab = 'user'}
+      class="pb-4 text-sm font-bold transition-all relative
+        {activeSettingTab === 'user' ? 'text-brand-800' : 'text-warm-400 hover:text-warm-600 cursor-pointer'}"
+    >
+      User & Data Cadangan
+      {#if activeSettingTab === 'user'}
+        <div class="absolute bottom-0 left-0 right-0 h-1 bg-brand-700 rounded-t-full"></div>
+      {/if}
+    </button>
+  </div>
 
-      <form on:submit={handleSave} class="space-y-4">
-        <!-- Forced Type Info -->
-        <div class="p-2 bg-rose-50 border border-rose-100 rounded-xl flex items-center gap-2">
-          <div class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></div>
-          <span class="text-[10px] font-bold text-rose-700 uppercase tracking-wider text-center">Tipe: Pengeluaran</span>
-        </div>
+  <div class="pt-4">
+    {#if activeSettingTab === 'store'}
+      <StoreSettings />
+    {:else if activeSettingTab === 'category'}
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
+        <!-- Left Column: CRUD Form -->
+        <div class="bg-white/70 backdrop-blur-sm border border-brand-300/60 rounded-2xl p-6 md:col-span-1 shadow-sm">
+          <h3 class="text-sm font-semibold text-warm-900 pb-3 border-b border-brand-200/60 mb-5">
+            {editingCategoryId ? 'Edit Kategori Pengeluaran' : 'Buat Kategori Baru'}
+          </h3>
 
-        <!-- Name Input -->
-        <div class="space-y-1.5">
-          <label for="cat-name" class="text-xs font-medium text-warm-600">Nama Kategori</label>
-          <input
-            id="cat-name"
-            type="text"
-            placeholder="Contoh: Bahan Baku, Listrik, Gaji..."
-            bind:value={name}
-            required
-            class="w-full px-3 py-2 bg-brand-50 border border-brand-300/60 text-warm-900 placeholder-warm-300 focus:border-brand-700 focus:ring-1 focus:ring-brand-600/30 focus:outline-none transition-colors rounded-xl text-sm"
-          />
-        </div>
+          <form on:submit={handleSave} class="space-y-4">
+            <!-- Forced Type Info -->
+            <div class="p-2 bg-rose-50 border border-rose-100 rounded-xl flex items-center gap-2">
+              <div class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></div>
+              <span class="text-[10px] font-bold text-rose-700 uppercase tracking-wider text-center">Tipe: Pengeluaran</span>
+            </div>
 
-        <!-- Color Swatch Picker -->
-        <div class="space-y-1.5">
-          <span class="text-xs font-medium text-zinc-400">Warna Aksen</span>
-          <div class="grid grid-cols-4 gap-3 pt-1.5">
-            {#each colorSwatches as swatch}
+            <!-- Name Input -->
+            <div class="space-y-1.5">
+              <label for="cat-name" class="text-xs font-medium text-warm-600">Nama Kategori</label>
+              <input
+                id="cat-name"
+                type="text"
+                placeholder="Contoh: Bahan Baku, Listrik, Gaji..."
+                bind:value={name}
+                required
+                class="w-full px-3 py-2 bg-brand-50 border border-brand-300/60 text-warm-900 placeholder-warm-300 focus:border-brand-700 focus:ring-1 focus:ring-brand-600/30 focus:outline-none transition-colors rounded-xl text-sm"
+              />
+            </div>
+
+            <!-- Color Swatch Picker -->
+            <div class="space-y-1.5">
+              <span class="text-xs font-medium text-zinc-400">Warna Aksen</span>
+              <div class="grid grid-cols-4 gap-3 pt-1.5">
+                {#each colorSwatches as swatch}
+                  <button
+                    type="button"
+                    on:click={() => selectedSwatchName = swatch.name}
+                    title={swatch.name}
+                    class="w-9 h-9 rounded-full flex items-center justify-center border transition-all duration-150 active:scale-90 relative cursor-pointer"
+                    style="background-color: {swatch.hex}; border-color: {selectedSwatchName === swatch.name ? '#ffffff' : 'transparent'}"
+                  >
+                    {#if selectedSwatchName === swatch.name}
+                      <span class="absolute inset-0.5 border border-zinc-950 rounded-full flex items-center justify-center text-zinc-950 text-[10px] font-bold bg-white/80">✓</span>
+                    {/if}
+                  </button>
+                {/each}
+              </div>
+            </div>
+
+            <!-- Submit & Actions Buttons -->
+            <div class="space-y-2 pt-2">
               <button
-                type="button"
-                on:click={() => selectedSwatchName = swatch.name}
-                title={swatch.name}
-                class="w-9 h-9 rounded-full flex items-center justify-center border transition-all duration-150 active:scale-90 relative cursor-pointer"
-                style="background-color: {swatch.hex}; border-color: {selectedSwatchName === swatch.name ? '#ffffff' : 'transparent'}"
+                type="submit"
+                class="w-full py-2.5 bg-brand-700 hover:bg-brand-800 active:scale-[0.99] text-brand-50 text-xs font-bold rounded-xl transition-all duration-150 cursor-pointer shadow-md"
               >
-                {#if selectedSwatchName === swatch.name}
-                  <span class="absolute inset-0.5 border border-zinc-950 rounded-full flex items-center justify-center text-zinc-950 text-[10px] font-bold bg-white/80">✓</span>
-                {/if}
+                {editingCategoryId ? 'Simpan Perubahan' : 'Buat Kategori'}
               </button>
-            {/each}
+              
+              {#if editingCategoryId}
+                <button
+                  type="button"
+                  on:click={resetForm}
+                  class="w-full py-2 bg-warm-100 hover:bg-warm-200 border border-warm-300 text-warm-700 text-xs font-semibold rounded-xl transition-all duration-150 cursor-pointer"
+                >
+                  Batal
+                </button>
+              {/if}
+            </div>
+          </form>
+        </div>
+
+        <!-- Right Column: Categories List -->
+        <div class="bg-white/70 backdrop-blur-sm border border-brand-300/60 rounded-2xl p-6 md:col-span-2 shadow-sm">
+          <h3 class="text-sm font-semibold text-warm-900 pb-3 border-b border-brand-200/60 mb-5">
+            Daftar Kategori Terdaftar ({expenseCategories.length})
+          </h3>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-warm-700">
+              <thead>
+                <tr class="border-b border-brand-200/60 text-[10px] font-bold tracking-wider text-warm-400 uppercase">
+                  <th class="py-2.5">Nama Kategori</th>
+                  <th class="py-2.5 text-right">Aksi</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-brand-200/60">
+                {#each expenseCategories as cat (cat.id)}
+                  <tr class="group hover:bg-brand-100/50 transition-colors {editingCategoryId === cat.id ? 'bg-brand-100/80' : ''}">
+                    <td class="py-3">
+                      <span class="inline-block px-2.5 py-0.5 rounded text-xs font-semibold border {getCategoryStyle(cat.name, $categories)}">
+                        {cat.name}
+                      </span>
+                    </td>
+                    <td class="py-3 text-right">
+                      <div class="flex items-center justify-end space-x-2.5">
+                        <button
+                          on:click={() => startEdit(cat)}
+                          title="Edit Kategori"
+                          class="text-warm-500 hover:text-warm-900 text-xs font-semibold py-1 px-2.5 border border-brand-300 rounded-lg hover:bg-brand-100 transition-all cursor-pointer active:scale-95"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          on:click={() => handleDelete(cat)}
+                          title="Hapus Kategori"
+                          class="text-warm-400 hover:text-rose-500 text-xs font-semibold py-1 px-2.5 border border-brand-300 rounded-lg hover:bg-rose-50 transition-all cursor-pointer active:scale-95"
+                        >
+                          Hapus
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                {/each}
+              </tbody>
+            </table>
+            {#if expenseCategories.length === 0}
+              <div class="py-10 text-center text-warm-400 text-xs">Belum ada kategori pengeluaran.</div>
+            {/if}
           </div>
         </div>
-
-        <!-- Submit & Actions Buttons -->
-        <div class="space-y-2 pt-2">
-          <button
-            type="submit"
-            class="w-full py-2.5 bg-brand-700 hover:bg-brand-800 active:scale-[0.99] text-brand-50 text-xs font-bold rounded-xl transition-all duration-150 cursor-pointer shadow-md"
-          >
-            {editingCategoryId ? 'Simpan Perubahan' : 'Buat Kategori'}
-          </button>
-          
-          {#if editingCategoryId}
-            <button
-              type="button"
-              on:click={resetForm}
-              class="w-full py-2 bg-warm-100 hover:bg-warm-200 border border-warm-300 text-warm-700 text-xs font-semibold rounded-xl transition-all duration-150 cursor-pointer"
-            >
-              Batal
-            </button>
-          {/if}
-        </div>
-      </form>
-    </div>
-
-    <!-- Right Column: Categories List -->
-    <div class="bg-white/70 backdrop-blur-sm border border-brand-300/60 rounded-2xl p-6 md:col-span-2 shadow-sm">
-      <h3 class="text-sm font-semibold text-warm-900 pb-3 border-b border-brand-200/60 mb-5">
-        Daftar Kategori Terdaftar ({expenseCategories.length})
-      </h3>
-
-      <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm text-warm-700">
-          <thead>
-            <tr class="border-b border-brand-200/60 text-[10px] font-bold tracking-wider text-warm-400 uppercase">
-              <th class="py-2.5">Nama Kategori</th>
-              <th class="py-2.5 text-right">Aksi</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-brand-200/60">
-            {#each expenseCategories as cat (cat.id)}
-              <tr class="group hover:bg-brand-100/50 transition-colors {editingCategoryId === cat.id ? 'bg-brand-100/80' : ''}">
-                <td class="py-3">
-                  <span class="inline-block px-2.5 py-0.5 rounded text-xs font-semibold border {getCategoryStyle(cat.name, $categories)}">
-                    {cat.name}
-                  </span>
-                </td>
-                <td class="py-3 text-right">
-                  <div class="flex items-center justify-end space-x-2.5">
-                    <button
-                      on:click={() => startEdit(cat)}
-                      title="Edit Kategori"
-                      class="text-warm-500 hover:text-warm-900 text-xs font-semibold py-1 px-2.5 border border-brand-300 rounded-lg hover:bg-brand-100 transition-all cursor-pointer active:scale-95"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      on:click={() => handleDelete(cat)}
-                      title="Hapus Kategori"
-                      class="text-warm-400 hover:text-rose-500 text-xs font-semibold py-1 px-2.5 border border-brand-300 rounded-lg hover:bg-rose-50 transition-all cursor-pointer active:scale-95"
-                    >
-                      Hapus
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            {/each}
-          </tbody>
-        </table>
-        {#if expenseCategories.length === 0}
-          <div class="py-10 text-center text-warm-400 text-xs">Belum ada kategori pengeluaran.</div>
-        {/if}
       </div>
-    </div>
-
+    {:else if activeSettingTab === 'user'}
+      <UserManagement {userRole} />
+    {/if}
   </div>
-
 </div>

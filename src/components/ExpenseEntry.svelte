@@ -22,14 +22,7 @@
   let selectedFileName = '';
   let ocrStatusText = 'Menyiapkan engine OCR...';
 
-  // ─── Budget Limits (Static Mock for premium UI showcase) ───────────────────
-  const budgetLimits = {
-    'Bahan Baku': 6000000,
-    'Packaging': 2500000,
-    'Gaji': 8000000,
-    'Operasional': 2000000,
-    'Lainnya': 1500005
-  };
+
 
   // ─── Quick Templates ──────────────────────────────────────────────────────
   const templates = [
@@ -683,67 +676,39 @@
     <!-- On iPad portrait/landscape (>= md and < xl), this grid divides into 2 columns. Column 1 gets Panel 1, Column 2 gets Panel 2 & 3 stacked. -->
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-1 gap-6 items-start">
       
-      <!-- Panel 1: Sisa Anggaran Real-time (Col 1 on Tablet) -->
+      <!-- Panel 1: Pengeluaran Bulanan per Kategori (Col 1 on Tablet) -->
       <div class="bg-white/80 backdrop-blur-sm border border-brand-300/60 rounded-3xl p-5 shadow-sm space-y-4">
         <div>
           <h2 class="text-xs font-bold text-warm-900 uppercase tracking-wider flex items-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5 text-brand-700">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.214.074a3 3 0 003.571-1.028A3 3 0 0013.25 12.18l-.213-.074a3 3 0 00-3.571 1.028A3 3 0 0010.75 16.18zM12 3v3m0 12v3" />
             </svg>
-            Sisa Anggaran Bulanan
+            Total Pengeluaran Bulan Ini
           </h2>
-          <p class="text-[10px] text-warm-400 mt-0.5">Kontrol batas budget maksimal bulan berjalan.</p>
+          <p class="text-[10px] text-warm-400 mt-0.5">Akumulasi pengeluaran per kategori berdasarkan transaksi bulan berjalan.</p>
         </div>
 
-        <div class="space-y-3.5">
-          {#each Object.entries(budgetLimits) as [catName, limit]}
-            {@const spent = categoryUsage[catName] || 0}
-            {@const draftAmount = draftUsage[catName] || 0}
+        <div class="space-y-2">
+          {#each expenseCats as cat (cat.id)}
+            {@const spent = categoryUsage[cat.name] || 0}
+            {@const draftAmount = draftUsage[cat.name] || 0}
             {@const simulatedSpent = spent + draftAmount}
-            {@const percentage = Math.min((spent / limit) * 100, 100)}
-            {@const simulatedPercentage = Math.min((simulatedSpent / limit) * 100, 100)}
-            {@const isExceeded = simulatedSpent > limit}
 
             <!-- Highlight if any draft item belongs to this category -->
-            <div class="space-y-1.5 p-2 rounded-xl transition duration-150 {draftAmount > 0 ? 'bg-brand-200/40 border border-brand-300/40' : 'border border-transparent'}">
-              <div class="flex items-center justify-between text-xs">
-                <span class="font-bold text-warm-700">{catName}</span>
-                <span class="font-extrabold text-[10px] uppercase {isExceeded ? 'text-rose-600 animate-pulse' : 'text-warm-550'}">
-                  {simulatedPercentage.toFixed(0)}%
-                </span>
+            <div class="flex items-center justify-between p-2.5 rounded-xl border transition-all duration-150 {draftAmount > 0 ? 'bg-brand-200/45 border-brand-400/60 shadow-xs' : 'bg-brand-50/20 border-brand-200/30'}" title={draftAmount > 0 ? "Termasuk draft di form (+ " + formatRupiah(draftAmount) + ")" : ""}>
+              <div class="flex items-center gap-2.5 min-w-0">
+                <!-- Color tag indicator -->
+                <span class="w-3.5 h-3.5 rounded-full border border-brand-300/40 shrink-0" style="background-color: {getCategoryHex(cat.name, $categories)}"></span>
+                <span class="font-bold text-xs text-warm-700 truncate">{cat.name}</span>
               </div>
-
-              <!-- Bar Progres -->
-              <div class="relative w-full h-2.5 bg-brand-100/80 rounded-full overflow-hidden border border-brand-200/50">
-                <!-- Bar Pengeluaran Tersimpan -->
-                <div 
-                  class="absolute left-0 top-0 h-full rounded-full transition-all duration-300"
-                  style="width: {percentage}%; background-color: {getCategoryHex(catName, $categories)}"
-                ></div>
-                <!-- Bar Simulasi Draft Penambahan -->
-                {#if draftAmount > 0}
-                  <div 
-                    class="absolute top-0 h-full rounded-full bg-rose-400/50 border-r border-dashed border-rose-600 transition-all duration-300"
-                    style="left: {percentage}%; width: {simulatedPercentage - percentage}%;"
-                  ></div>
-                {/if}
-              </div>
-
-              <div class="flex items-center justify-between text-[9px] text-warm-400">
-                <span>Terpakai: {formatRupiah(simulatedSpent)}</span>
-                <span>Limit: {formatRupiah(limit)}</span>
-              </div>
-              
-              {#if isExceeded}
-                <div class="flex items-center gap-1 text-[8.5px] text-rose-600 font-bold bg-rose-50/70 p-1.5 rounded-lg border border-rose-100/50 mt-1 animate-fade-in">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3 h-3 flex-shrink-0">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
-                  </svg>
-                  <span>Anggaran Kategori ini Terlampaui!</span>
-                </div>
-              {/if}
+              <span class="font-extrabold text-xs text-warm-900 shrink-0">
+                {formatRupiah(simulatedSpent)}
+              </span>
             </div>
           {/each}
+          {#if expenseCats.length === 0}
+            <p class="text-xs text-warm-400 text-center py-4">Belum ada kategori pengeluaran terdaftar.</p>
+          {/if}
         </div>
       </div>
 

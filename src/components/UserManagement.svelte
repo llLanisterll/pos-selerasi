@@ -298,13 +298,7 @@
   }
 </script>
 
-<div class="space-y-8 animate-fade-in">
-  <!-- View Header -->
-  <div class="pb-6 border-b border-brand-300/60">
-    <h1 class="text-2xl font-bold tracking-tight text-warm-900">Pengaturan User & Data</h1>
-    <p class="text-sm text-warm-500 mt-1">Halaman untuk mengelola pengguna (Owner/Admin) dan mencadangkan database.</p>
-  </div>
-
+<div class="space-y-6 animate-fade-in">
   <!-- Section: Statistik Sistem -->
   <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
     <!-- Card 1: Users -->
