@@ -54,17 +54,8 @@
   // ─── Reactive Variables ──────────────────────────────────────────────────
   $: expenseCats = $categories.filter(c => c.type === 'expense');
 
-  // Inisialisasi kategori default jika kosong
-  $: {
-    if (expenseCats.length > 0) {
-      items = items.map(item => {
-        if (!item.category) {
-          item.category = expenseCats[0].name;
-        }
-        return item;
-      });
-    }
-  }
+  // Inisialisasi kategori dikosongkan agar pengguna memilih secara manual
+  // (menghindari kesalahan pencatatan kategori default secara tidak sengaja)
 
   $: thisMonth = (() => {
     const d = new Date();
@@ -103,8 +94,7 @@
 
   // ─── Form Actions ─────────────────────────────────────────────────────────
   function addItem() {
-    const defaultCat = expenseCats.length > 0 ? expenseCats[0].name : 'Operasional';
-    items = [...items, { description: '', amount: '', category: defaultCat, quantity: 1 }];
+    items = [...items, { description: '', amount: '', category: '', quantity: 1 }];
   }
 
   function removeItem(index) {
@@ -139,6 +129,10 @@
         addNotification(`Nominal barang #${i + 1} tidak valid!`, 'error');
         return;
       }
+      if (!item.category) {
+        addNotification(`Kategori barang #${i + 1} belum dipilih!`, 'error');
+        return;
+      }
     }
 
     formLoading = true;
@@ -161,8 +155,7 @@
       addNotification(`${items.length} item pengeluaran berhasil disimpan!`, 'success');
       
       // Reset form
-      const defaultCat = expenseCats.length > 0 ? expenseCats[0].name : 'Operasional';
-      items = [{ description: '', amount: '', category: defaultCat, quantity: 1 }];
+      items = [{ description: '', amount: '', category: '', quantity: 1 }];
       formDate = todayStr();
       selectedFileName = '';
     } catch(e) {
@@ -339,7 +332,7 @@
             const exists = expenseCats.some(c => c.name.toLowerCase() === cat.toLowerCase());
             const finalCat = exists 
               ? expenseCats.find(c => c.name.toLowerCase() === cat.toLowerCase()).name 
-              : (expenseCats.length > 0 ? expenseCats[0].name : 'Operasional');
+              : '';
 
             parsedItems.push({
               description: name,
@@ -531,12 +524,10 @@
                     required
                     class="w-full px-4 py-3 lg:px-3 lg:py-2.5 bg-brand-50/40 border border-brand-300/60 text-warm-900 focus:border-brand-700 focus:bg-white focus:outline-none rounded-xl text-xs transition"
                   >
+                    <option value="" disabled selected>-- Pilih Kategori --</option>
                     {#each expenseCats as cat}
                       <option value={cat.name}>{cat.name}</option>
                     {/each}
-                    {#if expenseCats.length === 0}
-                      <option value="Operasional">Operasional</option>
-                    {/if}
                   </select>
                 </div>
 
