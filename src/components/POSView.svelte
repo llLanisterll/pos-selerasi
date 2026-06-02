@@ -14,8 +14,8 @@
   // Search filter for products
   let searchQuery = '';
 
-  // State for Customer Modal
-  let showModal = false;
+  // State for Checkout Details
+  let showCheckoutDetails = false;
   let customerList = [{ name: '', paymentMethod: 'QRIS', items: {} }];
 
   // State for Invoice Success Modal
@@ -54,7 +54,7 @@
       initialItems[item.id] = item.quantity;
     });
     customerList = [{ name: '', paymentMethod: paymentMethod, items: initialItems }];
-    showModal = true;
+    showCheckoutDetails = true;
   }
 
   function addCustomer() {
@@ -255,10 +255,10 @@
         invoices
       };
 
-      // Reset cart and modal
+      // Reset cart and detail view
       cart = [];
       customerList = [{ name: '', paymentMethod: paymentMethod, items: {} }];
-      showModal = false;
+      showCheckoutDetails = false;
       showSuccessModal = true;
       addNotification('Transaksi berhasil disimpan dan dibukukan!', 'success');
     } catch (err) {
@@ -266,6 +266,12 @@
     } finally {
       processing = false;
     }
+  }
+
+  function cancelCheckout() {
+    cart = [];
+    customerList = [{ name: '', paymentMethod: paymentMethod, items: {} }];
+    showCheckoutDetails = false;
   }
 
   function printInvoice(invoice) {
@@ -526,62 +532,216 @@
   <!-- POS Main Layout Grid -->
   <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 items-start">
     
-    <!-- LEFT SIDE: Product Selection Grid -->
+    <!-- LEFT SIDE: Product Selection / Checkout Details -->
     <div class="md:col-span-2 space-y-4">
-      <!-- Search Input -->
-      <div class="relative">
-        <span class="absolute left-3 top-2.5 text-warm-400">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
-            <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.637 10.637Z" />
-          </svg>
-        </span>
-        <input
-          type="text"
-          placeholder="Cari menu Ricebowl..."
-          bind:value={searchQuery}
-          class="w-full pl-9 pr-4 py-2 bg-white/70 border border-brand-300/60 text-warm-900 placeholder-warm-300 focus:border-brand-600 focus:ring-1 focus:ring-brand-500/30 focus:outline-none transition-colors rounded-xl text-sm backdrop-blur-sm"
-        />
-      </div>
-
-      <!-- Products Grid -->
-      {#if filteredProducts.length === 0}
-        <div class="bg-white/50 border border-brand-300/50 rounded-2xl py-24 text-center px-4">
-          <div class="w-12 h-12 border-2 border-dashed border-brand-300 rounded-xl flex items-center justify-center mb-4 mx-auto">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-warm-400">
-              <path stroke-linecap="round" stroke-linejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5m8.25 3v6.75m0 0-3-3m3 3 3-3M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
+      {#if !showCheckoutDetails}
+        <!-- Search Input -->
+        <div class="relative">
+          <span class="absolute left-3 top-2.5 text-warm-400">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+              <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.637 10.637Z" />
             </svg>
-          </div>
-          <h3 class="text-sm font-medium text-warm-700">Menu tidak ditemukan</h3>
-          <p class="text-xs text-warm-400 mt-1">Coba gunakan kata kunci pencarian lain atau tambahkan menu baru di tab Menu Produk.</p>
+          </span>
+          <input
+            type="text"
+            placeholder="Cari menu Ricebowl..."
+            bind:value={searchQuery}
+            class="w-full pl-9 pr-4 py-2 bg-white/70 border border-brand-300/60 text-warm-900 placeholder-warm-300 focus:border-brand-600 focus:ring-1 focus:ring-brand-500/30 focus:outline-none transition-colors rounded-xl text-sm backdrop-blur-sm"
+          />
         </div>
-      {:else}
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {#each filteredProducts as product, index (product.id)}
-            <!-- svelte-ignore a11y-click-events-have-key-events -->
-            <!-- svelte-ignore a11y-no-static-element-interactions -->
-            <div 
-              on:click={() => addToCart(product)}
-              class="bg-white/70 border border-brand-300/60 hover:border-brand-500 hover:bg-brand-50/60 rounded-2xl p-4 flex flex-col justify-between transition-all duration-200 cursor-pointer group active:scale-[0.98] shadow-sm select-none backdrop-blur-sm"
-            >
-              <div class="flex items-start space-x-3 mb-4">
-                <div class="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-xs bg-gradient-to-br {getAvatarGradient(index)} shadow">
-                  {product.name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase()}
+
+        <!-- Products Grid -->
+        {#if filteredProducts.length === 0}
+          <div class="bg-white/50 border border-brand-300/50 rounded-2xl py-24 text-center px-4">
+            <div class="w-12 h-12 border-2 border-dashed border-brand-300 rounded-xl flex items-center justify-center mb-4 mx-auto">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-warm-400">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5m8.25 3v6.75m0 0-3-3m3 3 3-3M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
+              </svg>
+            </div>
+            <h3 class="text-sm font-medium text-warm-700">Menu tidak ditemukan</h3>
+            <p class="text-xs text-warm-400 mt-1">Coba gunakan kata kunci pencarian lain atau tambahkan menu baru di tab Menu Produk.</p>
+          </div>
+        {:else}
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {#each filteredProducts as product, index (product.id)}
+              <!-- svelte-ignore a11y-click-events-have-key-events -->
+              <!-- svelte-ignore a11y-no-static-element-interactions -->
+              <div 
+                on:click={() => addToCart(product)}
+                class="bg-white/70 border border-brand-300/60 hover:border-brand-500 hover:bg-brand-50/60 rounded-2xl p-4 flex flex-col justify-between transition-all duration-200 cursor-pointer group active:scale-[0.98] shadow-sm select-none backdrop-blur-sm"
+              >
+                <div class="flex items-start space-x-3 mb-4">
+                  <div class="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-xs bg-gradient-to-br {getAvatarGradient(index)} shadow">
+                    {product.name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase()}
+                  </div>
+                  <div class="min-w-0">
+                    <h3 class="text-xs font-bold text-warm-900 group-hover:text-brand-800 transition-colors truncate">{product.name}</h3>
+                  </div>
                 </div>
-                <div class="min-w-0">
-                  <h3 class="text-xs font-bold text-warm-900 group-hover:text-brand-800 transition-colors truncate">{product.name}</h3>
+                <div class="flex items-center justify-between mt-auto border-t border-brand-200/60 pt-3">
+                  <span class="text-xs font-bold text-brand-800">{formatRupiah(product.price)}</span>
+                  <button 
+                    type="button"
+                    class="px-2.5 py-1 bg-brand-100 border border-brand-300 hover:bg-brand-500 hover:text-warm-900 group-hover:border-brand-500 group-hover:bg-brand-200 rounded-lg text-[10px] font-bold text-warm-700 transition duration-150 cursor-pointer"
+                  >
+                    + Tambah
+                  </button>
                 </div>
               </div>
-              <div class="flex items-center justify-between mt-auto border-t border-brand-200/60 pt-3">
-                <span class="text-xs font-bold text-brand-800">{formatRupiah(product.price)}</span>
-                <button 
-                  type="button"
-                  class="px-2.5 py-1 bg-brand-100 border border-brand-300 hover:bg-brand-500 hover:text-warm-900 group-hover:border-brand-500 group-hover:bg-brand-200 rounded-lg text-[10px] font-bold text-warm-700 transition duration-150 cursor-pointer"
-                >
-                  + Tambah
-                </button>
+            {/each}
+          </div>
+        {/if}
+      {:else}
+        <!-- Checkout / Allocation Details Panel -->
+        <div class="bg-white/80 backdrop-blur-sm border border-brand-300/60 rounded-3xl p-6 space-y-6 shadow-md" transition:fade={{ duration: 150 }}>
+          <!-- Header with Back to Products button -->
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-4 border-b border-brand-200/60 gap-4">
+            <div class="flex items-center space-x-3">
+              <div class="w-10 h-10 rounded-xl bg-brand-100 flex items-center justify-center text-brand-850 shrink-0 shadow-sm border border-brand-250">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-sm font-extrabold text-warm-900 leading-tight">Detail Pemesan & Porsi</h3>
+                <p class="text-[11px] text-warm-500 mt-0.5">Alokasikan total <span class="font-bold text-brand-800">{totalPortions} porsi</span> ke pelanggan.</p>
               </div>
             </div>
-          {/each}
+            
+            <button
+              type="button"
+              on:click={() => showCheckoutDetails = false}
+              class="flex items-center justify-center space-x-1.5 px-3.5 py-1.5 bg-brand-100 hover:bg-brand-200 border border-brand-300 text-brand-850 hover:text-brand-950 rounded-xl text-xs font-bold transition duration-150 cursor-pointer shadow-2xs active:scale-95"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+              </svg>
+              <span>Pilih Menu Lagi</span>
+            </button>
+          </div>
+
+          <div class="space-y-4 max-h-[50vh] overflow-y-auto pr-1">
+            {#each customerList as customer, i (i)}
+              <div class="bg-brand-50/40 border border-brand-200/80 rounded-2xl p-4 flex flex-col gap-4 shadow-xs transition-all hover:bg-brand-50/70 hover:border-brand-300/80 animate-fade-in">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-6 h-6 rounded-full bg-brand-200 flex items-center justify-center font-extrabold text-[10px] text-brand-900 shrink-0">
+                    {i + 1}
+                  </div>
+                  <div class="flex-grow min-w-0">
+                    <input
+                      type="text"
+                      placeholder="Nama Pelanggan"
+                      bind:value={customer.name}
+                      class="w-full px-3 py-1.5 bg-white border border-brand-300/50 text-warm-900 placeholder-warm-400 focus:border-brand-700 focus:ring-1 focus:ring-brand-500/20 focus:outline-none rounded-xl text-xs transition-colors shadow-2xs font-semibold"
+                    />
+                  </div>
+                  <div class="shrink-0 select-none">
+                    <select
+                      bind:value={customer.paymentMethod}
+                      class="px-2 py-1.5 bg-white border border-brand-300/50 text-warm-900 focus:border-brand-700 focus:outline-none rounded-xl text-[10px] font-bold shadow-2xs cursor-pointer focus:ring-1 focus:ring-brand-500/20"
+                    >
+                      <option value="QRIS">QRIS</option>
+                      <option value="Tunai">Tunai</option>
+                      <option value="Transfer Bank">Tf Bank</option>
+                      <option value="Aplikasi Online">Online</option>
+                    </select>
+                  </div>
+                  {#if customerList.length > 1}
+                    <button
+                      type="button"
+                      on:click={() => removeCustomer(i)}
+                      class="p-1.5 text-warm-400 hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-100 rounded-xl transition-all cursor-pointer shrink-0 active:scale-95"
+                      title="Hapus Pelanggan"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                      </svg>
+                    </button>
+                  {/if}
+                </div>
+
+                <div class="border-t border-brand-200/50 pt-3 space-y-2">
+                  <span class="text-[9px] font-bold uppercase tracking-wider text-warm-400 block mb-1">Alokasi Item Belanja</span>
+                  {#each cart as item}
+                    <div class="flex items-center justify-between text-xs py-1">
+                      <div class="min-w-0 flex-grow pr-2">
+                        <span class="font-bold text-warm-800 truncate block">{item.name}</span>
+                        <span class="text-[9px] text-warm-400">Keranjang: {item.quantity} porsi</span>
+                      </div>
+                      <div class="flex items-center bg-white border border-brand-300/50 rounded-xl p-1 shadow-2xs shrink-0 select-none">
+                        <button
+                          type="button"
+                          on:click={() => updateCustomerItemQty(i, item.id, -1)}
+                          class="w-9 h-9 flex items-center justify-center text-sm font-bold text-warm-600 hover:text-warm-900 hover:bg-brand-100 rounded-lg cursor-pointer transition active:scale-90 disabled:opacity-40 disabled:cursor-not-allowed"
+                          disabled={(customer.items[item.id] || 0) <= 0}
+                        >
+                          -
+                        </button>
+                        <span class="w-8 text-center font-extrabold text-sm text-warm-850">
+                          {customer.items[item.id] || 0}
+                        </span>
+                        <button
+                          type="button"
+                          on:click={() => updateCustomerItemQty(i, item.id, 1)}
+                          class="w-9 h-9 flex items-center justify-center text-sm font-bold text-warm-600 hover:text-warm-900 hover:bg-brand-100 rounded-lg cursor-pointer transition active:scale-90"
+                          disabled={allocatedSums[item.id] >= item.quantity}
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+                  {/each}
+                </div>
+              </div>
+            {/each}
+          </div>
+
+          <button
+            type="button"
+            on:click={addCustomer}
+            class="w-full flex items-center justify-center space-x-1.5 py-2.5 bg-brand-100 hover:bg-brand-200/80 border border-brand-350 text-warm-850 hover:text-warm-950 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-2xs shrink-0"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            <span>Tambah Pelanggan Baru</span>
+          </button>
+
+          <div class="p-4 bg-brand-50/70 border border-brand-300/70 rounded-2xl space-y-3 text-xs shadow-2xs shrink-0">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-warm-500 block mb-1">Status Alokasi Item</span>
+            {#each cart as item}
+              <div class="space-y-1.5">
+                <div class="flex justify-between items-center text-[11px]">
+                  <span class="font-semibold text-warm-700 truncate pr-2">{item.name}</span>
+                  <span class="font-bold {allocatedSums[item.id] === item.quantity ? 'text-emerald-700' : 'text-brand-850'}">
+                    {allocatedSums[item.id] || 0} / {item.quantity} porsi
+                  </span>
+                </div>
+                <div class="w-full bg-warm-200 h-1.5 rounded-full overflow-hidden">
+                  <div 
+                    class="h-full transition-all duration-300 rounded-full {allocatedSums[item.id] === item.quantity ? 'bg-emerald-600' : 'bg-brand-700'}"
+                    style="width: {Math.min(100, (((allocatedSums[item.id] || 0) / item.quantity) * 100))}%"
+                  ></div>
+                </div>
+              </div>
+            {/each}
+
+            {#if !isAllocationValid}
+              <div class="text-[10px] text-rose-600 font-bold mt-1 flex items-center gap-1.5 bg-rose-50 border border-rose-100 p-2.5 rounded-xl leading-relaxed">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4 shrink-0">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+                </svg>
+                <span>Harap sesuaikan alokasi semua menu di atas agar cocok dengan total pesanan.</span>
+              </div>
+            {:else}
+              <div class="text-[10px] text-emerald-700 font-bold mt-1 flex items-center gap-1.5 bg-emerald-50 border border-emerald-100 p-2.5 rounded-xl leading-relaxed">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4 shrink-0">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                </svg>
+                <span>Semua menu telah dialokasikan dengan cocok! Siap checkout.</span>
+              </div>
+            {/if}
+          </div>
         </div>
       {/if}
     </div>
@@ -614,19 +774,19 @@
                   </div>
                   
                   <div class="flex items-center space-x-3">
-                    <div class="flex items-center bg-brand-100 border border-brand-300/60 rounded-lg p-0.5">
+                    <div class="flex items-center bg-brand-100 border border-brand-300/60 rounded-xl p-1">
                       <button
                         type="button"
                         on:click={() => updateQuantity(item.id, -1)}
-                        class="w-5 h-5 flex items-center justify-center text-xs text-warm-500 hover:text-warm-900 hover:bg-brand-200 rounded cursor-pointer transition active:scale-90"
+                        class="w-9 h-9 flex items-center justify-center text-sm font-bold text-warm-600 hover:text-warm-900 hover:bg-brand-200 rounded-lg cursor-pointer transition active:scale-90"
                       >
                         -
                       </button>
-                      <span class="text-xs font-bold text-warm-800 w-6 text-center select-none">{item.quantity}</span>
+                      <span class="text-sm font-extrabold text-warm-850 w-8 text-center select-none">{item.quantity}</span>
                       <button
                         type="button"
                         on:click={() => updateQuantity(item.id, 1)}
-                        class="w-5 h-5 flex items-center justify-center text-xs text-warm-500 hover:text-warm-900 hover:bg-brand-200 rounded cursor-pointer transition active:scale-90"
+                        class="w-9 h-9 flex items-center justify-center text-sm font-bold text-warm-600 hover:text-warm-900 hover:bg-brand-200 rounded-lg cursor-pointer transition active:scale-90"
                       >
                         +
                       </button>
@@ -711,185 +871,41 @@
           </div>
         </div>
 
-        <button
-          type="button"
-          on:click={openCheckoutModal}
-          disabled={processing || cart.length === 0}
-          class="w-full py-2.5 bg-brand-700 hover:bg-brand-800 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed text-brand-50 text-xs font-bold rounded-xl transition-all duration-150 cursor-pointer shadow-md"
-        >
-          Proses
-        </button>
+        {#if !showCheckoutDetails}
+          <button
+            type="button"
+            on:click={openCheckoutModal}
+            disabled={processing || cart.length === 0}
+            class="w-full py-2.5 bg-brand-700 hover:bg-brand-800 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed text-brand-50 text-xs font-bold rounded-xl transition-all duration-150 cursor-pointer shadow-md"
+          >
+            Proses
+          </button>
+        {:else}
+          <div class="flex gap-3 pt-1">
+            <button
+              type="button"
+              on:click={cancelCheckout}
+              class="flex-1 py-2.5 bg-warm-50 hover:bg-warm-150 border border-brand-300 text-warm-750 text-xs font-bold rounded-xl transition active:scale-[0.98] text-center cursor-pointer font-bold"
+            >
+              Batal
+            </button>
+            <button
+              type="button"
+              on:click={handleCheckout}
+              disabled={processing || !isAllocationValid}
+              class="flex-2 py-2.5 bg-brand-700 hover:bg-brand-800 disabled:opacity-50 disabled:cursor-not-allowed text-brand-50 text-xs font-bold rounded-xl transition shadow-md active:scale-[0.98] text-center cursor-pointer font-bold"
+            >
+              {processing ? 'Menyimpan...' : 'Simpan & Checkout'}
+            </button>
+          </div>
+        {/if}
       </form>
     </div>
 
   </div>
 </div>
 
-{#if showModal}
-  <div 
-    transition:fade={{ duration: 150 }} 
-    class="fixed inset-0 bg-white/10 backdrop-blur-md z-50 flex items-center justify-center p-4"
-  >
-    <div 
-      transition:scale={{ duration: 150, start: 0.96 }}
-      class="bg-white border border-brand-300/80 rounded-3xl max-w-md w-full shadow-2xl p-6 space-y-6 flex flex-col max-h-[90vh]"
-    >
-      
-      <div class="flex items-center space-x-3 pb-4 border-b border-brand-200/60 shrink-0">
-        <div class="w-10 h-10 rounded-xl bg-brand-100 flex items-center justify-center text-brand-850 shrink-0 shadow-sm border border-brand-250">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
-          </svg>
-        </div>
-        <div>
-          <h3 class="text-sm font-extrabold text-warm-900 leading-tight">Detail Pemesan & Porsi</h3>
-          <p class="text-[11px] text-warm-500 mt-0.5">Alokasikan total <span class="font-bold text-brand-800">{totalPortions} porsi</span> ke pelanggan.</p>
-        </div>
-      </div>
 
-      <div class="space-y-4 overflow-y-auto pr-1 flex-grow">
-        {#each customerList as customer, i (i)}
-          <div class="bg-brand-50/40 border border-brand-200/80 rounded-2xl p-4 flex flex-col gap-4 shadow-xs transition-all hover:bg-brand-50/70 hover:border-brand-300/80 animate-fade-in">
-            <div class="flex items-center gap-2.5">
-              <div class="w-6 h-6 rounded-full bg-brand-200 flex items-center justify-center font-extrabold text-[10px] text-brand-900 shrink-0">
-                {i + 1}
-              </div>
-              <div class="flex-grow min-w-0">
-                <input
-                  type="text"
-                  placeholder="Nama Pelanggan"
-                  bind:value={customer.name}
-                  class="w-full px-3 py-1.5 bg-white border border-brand-300/50 text-warm-900 placeholder-warm-400 focus:border-brand-700 focus:ring-1 focus:ring-brand-500/20 focus:outline-none rounded-xl text-xs transition-colors shadow-2xs font-semibold"
-                />
-              </div>
-              <div class="shrink-0 select-none">
-                <select
-                  bind:value={customer.paymentMethod}
-                  class="px-2 py-1.5 bg-white border border-brand-300/50 text-warm-900 focus:border-brand-700 focus:outline-none rounded-xl text-[10px] font-bold shadow-2xs cursor-pointer focus:ring-1 focus:ring-brand-500/20"
-                >
-                  <option value="QRIS">QRIS</option>
-                  <option value="Tunai">Tunai</option>
-                  <option value="Transfer Bank">Tf Bank</option>
-                  <option value="Aplikasi Online">Online</option>
-                </select>
-              </div>
-              {#if customerList.length > 1}
-                <button
-                  type="button"
-                  on:click={() => removeCustomer(i)}
-                  class="p-1.5 text-warm-400 hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-100 rounded-xl transition-all cursor-pointer shrink-0 active:scale-95"
-                  title="Hapus Pelanggan"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                  </svg>
-                </button>
-              {/if}
-            </div>
-
-            <div class="border-t border-brand-200/50 pt-3 space-y-2">
-              <span class="text-[9px] font-bold uppercase tracking-wider text-warm-400 block mb-1">Alokasi Item Belanja</span>
-              {#each cart as item}
-                <div class="flex items-center justify-between text-xs py-1">
-                  <div class="min-w-0 flex-grow pr-2">
-                    <span class="font-bold text-warm-800 truncate block">{item.name}</span>
-                    <span class="text-[9px] text-warm-400">Keranjang: {item.quantity} porsi</span>
-                  </div>
-                  <div class="flex items-center bg-white border border-brand-300/50 rounded-xl px-1 py-0.5 shadow-2xs shrink-0 select-none">
-                    <button
-                      type="button"
-                      on:click={() => updateCustomerItemQty(i, item.id, -1)}
-                      class="w-5 h-5 flex items-center justify-center text-xs font-bold text-warm-600 hover:text-warm-900 hover:bg-brand-100 rounded-lg cursor-pointer transition active:scale-90 disabled:opacity-40 disabled:cursor-not-allowed"
-                      disabled={(customer.items[item.id] || 0) <= 0}
-                    >
-                      -
-                    </button>
-                    <span class="w-7 text-center font-extrabold text-xs text-warm-850">
-                      {customer.items[item.id] || 0}
-                    </span>
-                    <button
-                      type="button"
-                      on:click={() => updateCustomerItemQty(i, item.id, 1)}
-                      class="w-5 h-5 flex items-center justify-center text-xs font-bold text-warm-600 hover:text-warm-900 hover:bg-brand-100 rounded-lg cursor-pointer transition active:scale-90"
-                      disabled={allocatedSums[item.id] >= item.quantity}
-                    >
-                      +
-                    </button>
-                  </div>
-                </div>
-              {/each}
-            </div>
-          </div>
-        {/each}
-      </div>
-
-      <button
-        type="button"
-        on:click={addCustomer}
-        class="w-full flex items-center justify-center space-x-1.5 py-2.5 bg-brand-100 hover:bg-brand-200/80 border border-brand-350 text-warm-850 hover:text-warm-950 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-2xs shrink-0"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-        </svg>
-        <span>Tambah Pelanggan Baru</span>
-      </button>
-
-      <div class="p-4 bg-brand-50/70 border border-brand-300/70 rounded-2xl space-y-3 text-xs shadow-2xs shrink-0">
-        <span class="text-[10px] font-bold uppercase tracking-wider text-warm-500 block mb-1">Status Alokasi Item</span>
-        {#each cart as item}
-          <div class="space-y-1.5">
-            <div class="flex justify-between items-center text-[11px]">
-              <span class="font-semibold text-warm-700 truncate pr-2">{item.name}</span>
-              <span class="font-bold {allocatedSums[item.id] === item.quantity ? 'text-emerald-700' : 'text-brand-850'}">
-                {allocatedSums[item.id] || 0} / {item.quantity} porsi
-              </span>
-            </div>
-            <div class="w-full bg-warm-200 h-1.5 rounded-full overflow-hidden">
-              <div 
-                class="h-full transition-all duration-300 rounded-full {allocatedSums[item.id] === item.quantity ? 'bg-emerald-600' : 'bg-brand-700'}"
-                style="width: {Math.min(100, (((allocatedSums[item.id] || 0) / item.quantity) * 100))}%"
-              ></div>
-            </div>
-          </div>
-        {/each}
-
-        {#if !isAllocationValid}
-          <div class="text-[10px] text-rose-600 font-bold mt-1 flex items-center gap-1.5 bg-rose-50 border border-rose-100 p-2.5 rounded-xl leading-relaxed">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4 shrink-0">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
-            </svg>
-            <span>Harap sesuaikan alokasi semua menu di atas agar cocok dengan total pesanan.</span>
-          </div>
-        {:else}
-          <div class="text-[10px] text-emerald-700 font-bold mt-1 flex items-center gap-1.5 bg-emerald-50 border border-emerald-100 p-2.5 rounded-xl leading-relaxed">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4 shrink-0">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-            </svg>
-            <span>Semua menu telah dialokasikan dengan cocok! Siap checkout.</span>
-          </div>
-        {/if}
-      </div>
-
-      <div class="flex items-center justify-end space-x-3 pt-4 border-t border-brand-200/60 shrink-0">
-        <button
-          type="button"
-          on:click={() => showModal = false}
-          class="flex-1 py-2.5 bg-warm-50 hover:bg-warm-150 border border-brand-300 text-warm-750 text-xs font-bold rounded-xl transition active:scale-[0.98] text-center"
-        >
-          Batal
-        </button>
-        <button
-          type="button"
-          on:click={handleCheckout}
-          disabled={processing || !isAllocationValid}
-          class="flex-1 py-2.5 bg-brand-700 hover:bg-brand-800 disabled:opacity-50 disabled:cursor-not-allowed text-brand-50 text-xs font-bold rounded-xl transition shadow-md active:scale-[0.98] text-center"
-        >
-          {processing ? 'Menyimpan...' : 'Simpan & Checkout'}
-        </button>
-      </div>
-    </div>
-  </div>
-{/if}
 
 {#if showSuccessModal}
   <div 

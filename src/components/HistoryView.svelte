@@ -140,25 +140,24 @@
 
 <div class="space-y-8 animate-fade-in">
   <!-- View Header -->
-  <div class="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0 pb-6 border-b border-brand-300/60">
-    <div>
-      <h1 class="text-2xl font-bold tracking-tight text-warm-900">Riwayat &amp; Laporan</h1>
-      <p class="text-sm text-warm-500 mt-1">Kelompokkan dan tinjau performa kas Anda berdasarkan jangka waktu.</p>
+  <div class="pb-6 border-b border-brand-300/60">
+    <h1 class="text-2xl font-bold tracking-tight text-warm-900">Riwayat &amp; Laporan</h1>
+    <p class="text-sm text-warm-500 mt-1">Kelompokkan dan tinjau performa kas Anda berdasarkan jangka waktu.</p>
+  </div>
+
+  <!-- Filters -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
+    <div class="flex bg-brand-100 p-0.5 border border-brand-300/60 rounded-xl shadow-sm w-full">
+      <button on:click={() => typeFilter = 'all'} class="flex-1 text-center py-1.5 text-xs font-semibold rounded-lg transition-all {typeFilter === 'all' ? 'bg-white text-warm-900 shadow-sm border border-brand-300/60' : 'text-warm-500 hover:text-warm-900'}">Semua</button>
+      <button on:click={() => typeFilter = 'income'} class="flex-1 text-center py-1.5 text-xs font-semibold rounded-lg transition-all {typeFilter === 'income' ? 'bg-brand-500 text-warm-900 shadow-sm border border-brand-600/30' : 'text-warm-500 hover:text-warm-900'}">Pemasukan</button>
+      <button on:click={() => typeFilter = 'expense'} class="flex-1 text-center py-1.5 text-xs font-semibold rounded-lg transition-all {typeFilter === 'expense' ? 'bg-rose-500 text-white shadow-sm border border-rose-600/30' : 'text-warm-500 hover:text-warm-900'}">Pengeluaran</button>
     </div>
 
-    <div class="flex flex-wrap gap-2">
-      <div class="flex bg-brand-100 p-0.5 border border-brand-300/60 rounded-xl shadow-sm">
-        <button on:click={() => typeFilter = 'all'} class="px-4 py-1.5 text-xs font-semibold rounded-lg transition-all {typeFilter === 'all' ? 'bg-white text-warm-900 shadow-sm border border-brand-300/60' : 'text-warm-500 hover:text-warm-900'}">Semua</button>
-        <button on:click={() => typeFilter = 'income'} class="px-4 py-1.5 text-xs font-semibold rounded-lg transition-all {typeFilter === 'income' ? 'bg-brand-500 text-warm-900 shadow-sm border border-brand-600/30' : 'text-warm-500 hover:text-warm-900'}">Pemasukan</button>
-        <button on:click={() => typeFilter = 'expense'} class="px-4 py-1.5 text-xs font-semibold rounded-lg transition-all {typeFilter === 'expense' ? 'bg-rose-500 text-white shadow-sm border border-rose-600/30' : 'text-warm-500 hover:text-warm-900'}">Pengeluaran</button>
-      </div>
-
-      <div class="flex bg-brand-100 p-0.5 border border-brand-300/60 rounded-xl shadow-sm">
-        <button on:click={() => filterMode = 'daily'} class="px-4 py-1.5 text-xs font-semibold rounded-lg transition-all {filterMode === 'daily' ? 'bg-brand-500 text-warm-900 shadow-sm' : 'text-warm-500'}">Harian</button>
-        <button on:click={() => filterMode = 'weekly'} class="px-4 py-1.5 text-xs font-semibold rounded-lg transition-all {filterMode === 'weekly' ? 'bg-brand-500 text-warm-900 shadow-sm' : 'text-warm-500'}">Mingguan</button>
-        <button on:click={() => filterMode = 'monthly'} class="px-4 py-1.5 text-xs font-semibold rounded-lg transition-all {filterMode === 'monthly' ? 'bg-brand-500 text-warm-900 shadow-sm' : 'text-warm-500'}">Bulanan</button>
-        <button on:click={() => filterMode = 'yearly'} class="px-4 py-1.5 text-xs font-semibold rounded-lg transition-all {filterMode === 'yearly' ? 'bg-brand-500 text-warm-900 shadow-sm' : 'text-warm-500'}">Tahunan</button>
-      </div>
+    <div class="flex bg-brand-100 p-0.5 border border-brand-300/60 rounded-xl shadow-sm w-full">
+      <button on:click={() => filterMode = 'daily'} class="flex-1 text-center py-1.5 text-xs font-semibold rounded-lg transition-all {filterMode === 'daily' ? 'bg-brand-500 text-warm-900 shadow-sm' : 'text-warm-500'}">Harian</button>
+      <button on:click={() => filterMode = 'weekly'} class="flex-1 text-center py-1.5 text-xs font-semibold rounded-lg transition-all {filterMode === 'weekly' ? 'bg-brand-500 text-warm-900 shadow-sm' : 'text-warm-500'}">Mingguan</button>
+      <button on:click={() => filterMode = 'monthly'} class="flex-1 text-center py-1.5 text-xs font-semibold rounded-lg transition-all {filterMode === 'monthly' ? 'bg-brand-500 text-warm-900 shadow-sm' : 'text-warm-500'}">Bulanan</button>
+      <button on:click={() => filterMode = 'yearly'} class="flex-1 text-center py-1.5 text-xs font-semibold rounded-lg transition-all {filterMode === 'yearly' ? 'bg-brand-500 text-warm-900 shadow-sm' : 'text-warm-500'}">Tahunan</button>
     </div>
   </div>
 
